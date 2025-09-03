@@ -1,6 +1,6 @@
 blueprint:
-  name: Aeotec Siren 6 - Advanced Control (Sensors, °F)
-  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds.
+  name: Aeotec Siren 6 - Advanced Control (Fahrenheit)
+  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds.
   domain: automation
   author: Home Assistant Community
   input:
@@ -40,18 +40,31 @@ blueprint:
           max: 600
           step: 1
           mode: box
+    # Checkbox inputs
+    enable_door_sensors:
+      name: Enable Door/Window Sensors?
+      description: Check this box to enable the door/window sensor trigger.
+      default: false
+      selector:
+        boolean: {}
     door_sensors:
       name: Door/Window Sensors (Optional)
-      description: Select door or window contact sensors that will trigger the alarm when opened.
+      description: Select door or window contact sensors that will trigger the alarm when opened. Only active if enabled above.
       default: []
       selector:
         entity:
           domain: binary_sensor
           device_class: door
           multiple: true
+    enable_temp_sensors:
+      name: Enable Temperature Sensors?
+      description: Check this box to enable the temperature sensor trigger.
+      default: false
+      selector:
+        boolean: {}
     temp_sensors:
       name: Temperature Sensors (Optional)
-      description: Select temperature sensors to trigger the alarm.
+      description: Select temperature sensors to trigger the alarm. Only active if enabled above.
       default: []
       selector:
         entity:
@@ -68,9 +81,15 @@ blueprint:
           max: 200
           unit_of_measurement: "°F"
           step: 1
+    enable_humidity_sensors:
+      name: Enable Humidity Sensors?
+      description: Check this box to enable the humidity sensor trigger.
+      default: false
+      selector:
+        boolean: {}
     humidity_sensors:
       name: Humidity Sensors (Optional)
-      description: Select humidity sensors to trigger the alarm.
+      description: Select humidity sensors to trigger the alarm. Only active if enabled above.
       default: []
       selector:
         entity:
@@ -100,26 +119,54 @@ trigger:
     above: !input humidity_threshold
 
 action:
-  - service: zwave_js.set_config_parameter
-    data:
-      parameter: 37
-      value: !input siren_duration
-    target:
-      entity_id: !input siren_entity
-  - service: zwave_js.set_config_parameter
-    data:
-      parameter: 38
-      value: !input siren_volume
-    target:
-      entity_id: !input siren_entity
-  - service: zwave_js.set_config_parameter
-    data:
-      parameter: 39
-      value: !input siren_tone
-    target:
-      entity_id: !input siren_entity
-  - service: siren.turn_on
-    target:
-      entity_id: !input siren_entity
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ is_array(trigger.entity_id) or !is_array(trigger.entity_id) }}" # This condition is always true to handle both single and multiple entities
+          - condition: or
+            conditions:
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ is_state('input_boolean.enable_door_sensors', 'on') }}"
+                  - condition: state
+                    entity_id: !input door_sensors
+                    to: 'on'
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ is_state('input_boolean.enable_temp_sensors', 'on') }}"
+                  - condition: numeric_state
+                    entity_id: !input temp_sensors
+                    above: !input temp_threshold
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ is_state('input_boolean.enable_humidity_sensors', 'on') }}"
+                  - condition: numeric_state
+                    entity_id: !input humidity_sensors
+                    above: !input humidity_threshold
+        sequence:
+          - service: zwave_js.set_config_parameter
+            data:
+              parameter: 37
+              value: !input siren_duration
+            target:
+              entity_id: !input siren_entity
+          - service: zwave_js.set_config_parameter
+            data:
+              parameter: 38
+              value: !input siren_volume
+            target:
+              entity_id: !input siren_entity
+          - service: zwave_js.set_config_parameter
+            data:
+              parameter: 39
+              value: !input siren_tone
+            target:
+              entity_id: !input siren_entity
+          - service: siren.turn_on
+            target:
+              entity_id: !input siren_entity
 
 mode: single
