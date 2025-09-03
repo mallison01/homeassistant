@@ -1,15 +1,17 @@
 blueprint:
-  name: Aeotec Siren 6 - Advanced Control
+  name: Aeotec Siren 6 - Advanced Control (Fahrenheit)
   description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds and provides a dropdown menu for tone selection.
   domain: automation
   author: Home Assistant Community
   input:
-    siren_entity:
-      name: Siren Entity
-      description: The Z-Wave JS siren entity to control.
+    siren_device:
+      name: Siren Device
+      description: The Z-Wave JS device for the Aeotec Siren 6.
       selector:
-        entity:
-          domain: siren
+        device:
+          integration: zwave_js
+          manufacturer: Aeotec
+          model: ZW164
     siren_tone:
       name: Siren Tone
       description: Select one of the 30 available tones by name.
@@ -97,7 +99,6 @@ blueprint:
           max: 600
           step: 1
           mode: box
-    # Checkbox inputs
     enable_door_sensors:
       name: Enable Door/Window Sensors?
       description: Check this box to enable the door/window sensor trigger.
@@ -207,21 +208,21 @@ action:
               parameter: 37
               value: !input siren_duration
             target:
-              entity_id: !input siren_entity
+              device_id: !input siren_device
           - service: zwave_js.set_config_parameter
             data:
               parameter: 38
               value: !input siren_volume
             target:
-              entity_id: !input siren_entity
+              device_id: !input siren_device
           - service: zwave_js.set_config_parameter
             data:
               parameter: 39
               value: !input siren_tone
             target:
-              entity_id: !input siren_entity
+              device_id: !input siren_device
           - service: siren.turn_on
             target:
-              entity_id: !input siren_entity
+              device_id: !input siren_device
 
 mode: single
