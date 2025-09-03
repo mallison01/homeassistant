@@ -1,6 +1,6 @@
 blueprint:
   name: Aeotec Siren 6 - Advanced Control (Sensors)
-  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version allows selecting between Celsius and Fahrenheit for temperature thresholds.
+  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version allows selecting between Celsius and Fahrenheit for temperature thresholds and supports both 'Aeotec' and 'Aeotec Ltd.' manufacturers.
   domain: automation
   author: Home Assistant Community
   input:
@@ -10,7 +10,9 @@ blueprint:
       selector:
         device:
           integration: zwave_js
-          manufacturer: Aeotec
+          manufacturer:
+            - Aeotec
+            - Aeotec Ltd.
     siren_tone:
       name: Siren Tone
       description: Select one of the 30 available tones by name.
