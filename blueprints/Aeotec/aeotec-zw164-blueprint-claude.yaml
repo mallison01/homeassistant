@@ -308,6 +308,9 @@ variables:
   temp_unit: !input temperature_unit
   temp_condition: !input temperature_condition
   humidity_condition: !input humidity_condition
+  siren_tone: !input siren_tone
+  light_effect: !input light_effect
+  light_color: !input light_color
 
 # Triggers
 trigger:
