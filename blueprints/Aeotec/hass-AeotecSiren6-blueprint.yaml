@@ -1,6 +1,6 @@
 blueprint:
-  name: Aeotec Siren 6 - Advanced Control (Fahrenheit)
-  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds and provides a dropdown menu for tone selection.
+  name: Aeotec Siren 6 - Advanced Control (Sensors)
+  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version allows selecting between Celsius and Fahrenheit for temperature thresholds.
   domain: automation
   author: Home Assistant Community
   input:
@@ -15,70 +15,70 @@ blueprint:
     siren_tone:
       name: Siren Tone
       description: Select one of the 30 available tones by name.
-      default: '1'
+      default: 1
       selector:
         select:
           options:
             - label: "1. Ding Dong"
-              value: '1'
+              value: 1
             - label: "2. Ding Dong Tubular"
-              value: '2'
+              value: 2
             - label: "3. Traditional Apartment Buzzer"
-              value: '3'
+              value: 3
             - label: "4. Electric Apartment Buzzer"
-              value: '4'
+              value: 4
             - label: "5. Westminster Chimes"
-              value: '5'
+              value: 5
             - label: "6. Chimes"
-              value: '6'
+              value: 6
             - label: "7. Cuckoo"
-              value: '7'
+              value: 7
             - label: "8. Traditional Bell"
-              value: '8'
+              value: 8
             - label: "9. Smoke Alarm"
-              value: '9'
+              value: 9
             - label: "10. Smoke Alarm 2"
-              value: '10'
+              value: 10
             - label: "11. Fire Evacuation Buzzer"
-              value: '11'
+              value: 11
             - label: "12. CO Alarm"
-              value: '12'
+              value: 12
             - label: "13. Klaxon"
-              value: '13'
+              value: 13
             - label: "14. Deep Klaxon"
-              value: '14'
+              value: 14
             - label: "15. Warning Tone"
-              value: '15'
+              value: 15
             - label: "16. Tornado Siren"
-              value: '16'
+              value: 16
             - label: "17. Alarm"
-              value: '17'
+              value: 17
             - label: "18. Deep Alarm"
-              value: '18'
+              value: 18
             - label: "19. Alarm Archangel"
-              value: '19'
+              value: 19
             - label: "20. Alarm Shrill"
-              value: '20'
+              value: 20
             - label: "21. Digital Siren"
-              value: '21'
+              value: 21
             - label: "22. Alert Series"
-              value: '22'
+              value: 22
             - label: "23. Ship Bell"
-              value: '23'
+              value: 23
             - label: "24. Clock Buzzer"
-              value: '24'
+              value: 24
             - label: "25. Christmas Tree"
-              value: '25'
+              value: 25
             - label: "26. Gong"
-              value: '26'
+              value: 26
             - label: "27. Single Bell Ting"
-              value: '27'
+              value: 27
             - label: "28. Tonal Pulse"
-              value: '28'
+              value: 28
             - label: "29. Upward Tone"
-              value: '29'
+              value: 29
             - label: "30. Door Open"
-              value: '30'
+              value: 30
     siren_volume:
       name: Siren Volume
       description: Set the volume level of the siren (0-100%).
@@ -91,7 +91,7 @@ blueprint:
           mode: slider
     siren_duration:
       name: Siren Duration
-      description: The duration in seconds that the tone should play. Set to 0 for the default tone length.
+      description: The duration in seconds that the tone should play.
       default: 5
       selector:
         number:
@@ -112,8 +112,10 @@ blueprint:
       selector:
         entity:
           domain: binary_sensor
-          device_class: door
           multiple: true
+          device_class: 
+            - door
+            - window
     enable_temp_sensors:
       name: Enable Temperature Sensors?
       description: Check this box to enable the temperature sensor trigger.
@@ -129,15 +131,25 @@ blueprint:
           domain: sensor
           device_class: temperature
           multiple: true
+    temp_unit:
+      name: Temperature Unit
+      description: Select the unit of measurement for the temperature threshold.
+      default: 'Fahrenheit'
+      selector:
+        select:
+          options:
+            - label: "Fahrenheit (°F)"
+              value: 'Fahrenheit'
+            - label: "Celsius (°C)"
+              value: 'Celsius'
     temp_threshold:
       name: Temperature Threshold
-      description: Trigger the alarm when temperature goes above this value in Fahrenheit.
+      description: Trigger the alarm when temperature goes above this value.
       default: 85
       selector:
         number:
-          min: 0
+          min: -50
           max: 200
-          unit_of_measurement: "°F"
           step: 1
     enable_humidity_sensors:
       name: Enable Humidity Sensors?
@@ -165,16 +177,32 @@ blueprint:
           unit_of_measurement: "%"
           step: 1
 
+variables:
+  temp_unit: !input temp_unit
+  temp_threshold: !input temp_threshold
+
 trigger:
   - platform: state
     entity_id: !input door_sensors
     to: 'on'
   - platform: numeric_state
-    entity_id: !input temp_sensors
-    above: !input temp_threshold
-  - platform: numeric_state
     entity_id: !input humidity_sensors
     above: !input humidity_threshold
+  - platform: template
+    value_template: >
+      {% if temp_unit == 'Fahrenheit' %}
+        {% for sensor in temp_sensors %}
+          {% if states(sensor) | float > temp_threshold | float %}
+            true
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% for sensor in temp_sensors %}
+          {% if states(sensor) | float > temp_threshold | float %}
+            true
+          {% endif %}
+        {% endfor %}
+      {% endif %}
 
 action:
   - choose:
@@ -192,9 +220,8 @@ action:
                 conditions:
                   - condition: template
                     value_template: "{{ enable_temp_sensors }}"
-                  - condition: numeric_state
-                    entity_id: !input temp_sensors
-                    above: !input temp_threshold
+                  - condition: template
+                    value_template: "{{ is_state('trigger.platform', 'template') }}"
               - condition: and
                 conditions:
                   - condition: template
@@ -203,26 +230,11 @@ action:
                     entity_id: !input humidity_sensors
                     above: !input humidity_threshold
         sequence:
-          - service: zwave_js.set_config_parameter
-            data:
-              parameter: 37
-              value: !input siren_duration
-            target:
-              device_id: !input siren_device
-          - service: zwave_js.set_config_parameter
-            data:
-              parameter: 38
-              value: !input siren_volume
-            target:
-              device_id: !input siren_device
-          - service: zwave_js.set_config_parameter
-            data:
-              parameter: 39
-              value: !input siren_tone
-            target:
-              device_id: !input siren_device
           - service: siren.turn_on
             target:
               device_id: !input siren_device
-
+            data:
+              tone: !input siren_tone
+              volume_level: "{{ states('input_number.siren_volume') | float / 100 }}"
+              duration: "{{ states('input_number.siren_duration') | int }}"
 mode: single
