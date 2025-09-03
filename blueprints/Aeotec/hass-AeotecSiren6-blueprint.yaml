@@ -1,6 +1,6 @@
 blueprint:
   name: Aeotec Siren 6 - Advanced Control (Fahrenheit)
-  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds.
+  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds and provides a dropdown menu for tone selection.
   domain: automation
   author: Home Assistant Community
   input:
@@ -12,14 +12,71 @@ blueprint:
           domain: siren
     siren_tone:
       name: Siren Tone
-      description: Select one of the 30 available tones. Refer to the Aeotec documentation for previews.
-      default: 1
+      description: Select one of the 30 available tones by name.
+      default: '1'
       selector:
-        number:
-          min: 1
-          max: 30
-          step: 1
-          mode: slider
+        select:
+          options:
+            - label: "1. Ding Dong"
+              value: '1'
+            - label: "2. Ding Dong Tubular"
+              value: '2'
+            - label: "3. Traditional Apartment Buzzer"
+              value: '3'
+            - label: "4. Electric Apartment Buzzer"
+              value: '4'
+            - label: "5. Westminster Chimes"
+              value: '5'
+            - label: "6. Chimes"
+              value: '6'
+            - label: "7. Cuckoo"
+              value: '7'
+            - label: "8. Traditional Bell"
+              value: '8'
+            - label: "9. Smoke Alarm"
+              value: '9'
+            - label: "10. Smoke Alarm 2"
+              value: '10'
+            - label: "11. Fire Evacuation Buzzer"
+              value: '11'
+            - label: "12. CO Alarm"
+              value: '12'
+            - label: "13. Klaxon"
+              value: '13'
+            - label: "14. Deep Klaxon"
+              value: '14'
+            - label: "15. Warning Tone"
+              value: '15'
+            - label: "16. Tornado Siren"
+              value: '16'
+            - label: "17. Alarm"
+              value: '17'
+            - label: "18. Deep Alarm"
+              value: '18'
+            - label: "19. Alarm Archangel"
+              value: '19'
+            - label: "20. Alarm Shrill"
+              value: '20'
+            - label: "21. Digital Siren"
+              value: '21'
+            - label: "22. Alert Series"
+              value: '22'
+            - label: "23. Ship Bell"
+              value: '23'
+            - label: "24. Clock Buzzer"
+              value: '24'
+            - label: "25. Christmas Tree"
+              value: '25'
+            - label: "26. Gong"
+              value: '26'
+            - label: "27. Single Bell Ting"
+              value: '27'
+            - label: "28. Tonal Pulse"
+              value: '28'
+            - label: "29. Upward Tone"
+              value: '29'
+            - label: "30. Door Open"
+              value: '30'
     siren_volume:
       name: Siren Volume
       description: Set the volume level of the siren (0-100%).
@@ -121,28 +178,26 @@ trigger:
 action:
   - choose:
       - conditions:
-          - condition: template
-            value_template: "{{ is_array(trigger.entity_id) or !is_array(trigger.entity_id) }}" # This condition is always true to handle both single and multiple entities
           - condition: or
             conditions:
               - condition: and
                 conditions:
                   - condition: template
-                    value_template: "{{ is_state('input_boolean.enable_door_sensors', 'on') }}"
+                    value_template: "{{ enable_door_sensors }}"
                   - condition: state
                     entity_id: !input door_sensors
                     to: 'on'
               - condition: and
                 conditions:
                   - condition: template
-                    value_template: "{{ is_state('input_boolean.enable_temp_sensors', 'on') }}"
+                    value_template: "{{ enable_temp_sensors }}"
                   - condition: numeric_state
                     entity_id: !input temp_sensors
                     above: !input temp_threshold
               - condition: and
                 conditions:
                   - condition: template
-                    value_template: "{{ is_state('input_boolean.enable_humidity_sensors', 'on') }}"
+                    value_template: "{{ enable_humidity_sensors }}"
                   - condition: numeric_state
                     entity_id: !input humidity_sensors
                     above: !input humidity_threshold
