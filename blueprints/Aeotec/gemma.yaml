@@ -1,0 +1,158 @@
+# Home Assistant Blueprint - Aeotec Indoor Siren 6 (ZW164) - ZWaveJS
+
+# Device Selection
+device_name: "Aeotec Indoor Siren 6"
+device_entity: "zwave.sensor.aeotec_indoor_siren_6"
+
+# Sensor Selection (Dropdowns)
+sensor_dropdown_label = "Select Sensor Trigger:"
+sensor_options = [
+    "door_sensor",
+    "window_sensor",
+    "temperature_sensor",
+    "humidity_sensor"
+]
+sensor_dropdown = {
+    "label": sensor_dropdown_label,
+    "options": sensor_options
+}
+
+# Temperature Settings
+temperature_slider_label = "Temperature (Celsius/Fahrenheit)"
+temperature_slider_name = "zwave.sensor.temperature_slider"
+temperature_unit_dropdown_label = "Temperature Unit:"
+temperature_unit_options = ["Celsius", "Fahrenheit"]
+temperature_unit_dropdown = {
+    "label": temperature_unit_dropdown_label,
+    "options": temperature_unit_options
+}
+
+
+# Humidity Settings
+humidity_slider_label = "Humidity (Celsius/Fahrenheit)"
+humidity_slider_name = "zwave.sensor.humidity_slider"
+humidity_slider_options = ["Celsius", "Fahrenheit"]
+humidity_slider_dropdown = {
+    "label": humidity_slider_label,
+    "options": humidity_slider_options
+}
+
+# Siren Volume & Duration
+siren_volume_slider_label = "Siren Volume:"
+siren_volume_slider_name = "zwave.sensor.siren_volume_slider"
+siren_volume_slider_options = [
+    {
+        "label": siren_volume_slider_label,
+        "options": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], #Adjust based on the slider range
+        "entity": "sensor.siren_volume_slider" # Trigger entity for siren volume
+    }
+]
+
+siren_duration_slider_label = "Siren Duration:"
+siren_duration_slider_name = "zwave.sensor.siren_duration_slider"
+siren_duration_slider_options = [
+    {
+        "label": siren_duration_slider_label,
+        "options": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], #Adjust based on the slider range
+        "entity": "sensor.siren_duration_slider" # Trigger entity for siren duration
+    }
+]
+
+# Tone Settings (Dropdown)
+tone_dropdown_label = "Select Siren Tone:"
+tone_options = [
+    {"value": "tone1", "label": "Tone 1"},
+    {"value": "tone2", "label": "Tone 2"},
+    {"value": "tone3", "label": "Tone 3"},
+    {"value": "tone4", "label": "Tone 4"},
+    {"value": "tone5", "label": "Tone 5"},
+    {"value": "tone6", "label": "Tone 6"}
+]
+tone_dropdown = {
+    "label": tone_dropdown_label,
+    "options": tone_options
+}
+
+
+# Light Effect (Dropdown)
+light_effect_dropdown_label = "Select Light Effect:"
+light_effect_options = [
+    {"value": "effect1", "label": "Effect 1"},
+    {"value": "effect2", "label": "Effect 2"},
+    {"value": "effect3", "label": "Effect 3"}
+]
+light_effect_dropdown = {
+    "label": light_effect_dropdown_label,
+    "options": light_effect_options
+}
+
+
+# Time Condition (Checkbox - Optional)
+time_condition_label = "Disable Siren at Specific Time:"
+time_condition_checkbox = [
+    {
+        "label": time_condition_label,
+        "entity": "input_boolean.disable_siren_at_time"  # Add this input_boolean entity
+    }
+]
+
+
+
+# UI Configuration (Example - adjust to your needs)
+ui_config = {
+    "type": "vertical-stack",
+    "children": [
+        {
+            "type": "label",
+            "text": device_name
+        },
+        {
+            "type": "vertical-stack",
+            "children": [
+                {
+                    "type": "vertical-stack",
+                    "children": sensor_dropdown
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": [
+                        {
+                            "type": "vertical-stack",
+                            "children": temperature_unit_dropdown
+                        },
+                        {
+                            "type": "vertical-stack",
+                            "children": time_condition_checkbox
+                        }
+                    ]
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": [
+                        {
+                            "type": "vertical-stack",
+                            "children": temperature_unit_dropdown
+                        },
+                        {
+                            "type": "vertical-stack",
+                            "children": time_condition_checkbox
+                        }
+                    ]
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": [
+                        {
+                            "type": "vertical-stack",
+                            "children": temperature_unit_dropdown
+                        },
+                        {
+                            "type": "vertical-stack",
+                            "children": time_condition_checkbox
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
