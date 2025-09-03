@@ -10,9 +10,8 @@ blueprint:
       selector:
         device:
           integration: zwave_js
-          manufacturer:
-            - Aeotec
-            - Aeotec Ltd.
+          manufacturer: Aeotec
+          model: ZW164
     siren_tone:
       name: Siren Tone
       description: Select one of the 30 available tones by name.
