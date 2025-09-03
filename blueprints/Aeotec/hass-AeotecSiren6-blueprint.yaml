@@ -11,7 +11,6 @@ blueprint:
         device:
           integration: zwave_js
           manufacturer: Aeotec
-          model: ZW164
     siren_tone:
       name: Siren Tone
       description: Select one of the 30 available tones by name.
@@ -234,7 +233,7 @@ action:
             target:
               device_id: !input siren_device
             data:
-              tone: "{{ input_number.siren_tone | int }}"
-              volume_level: "{{ states('input_number.siren_volume') | float / 100 }}"
+              tone: !input siren_tone | int
+              volume_level: "{{ (states('input_number.siren_volume') | float) / 100 }}"
               duration: "{{ states('input_number.siren_duration') | int }}"
 mode: single
