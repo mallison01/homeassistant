@@ -1,6 +1,6 @@
 blueprint:
-  name: Aeotec Siren 6 - Advanced Control (Sensors)
-  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on door, temperature, or humidity sensors.
+  name: Aeotec Siren 6 - Advanced Control (Sensors, °F)
+  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds.
   domain: automation
   author: Home Assistant Community
   input:
@@ -60,13 +60,13 @@ blueprint:
           multiple: true
     temp_threshold:
       name: Temperature Threshold
-      description: Trigger the alarm when temperature goes above this value.
-      default: 30
+      description: Trigger the alarm when temperature goes above this value in Fahrenheit.
+      default: 85
       selector:
         number:
-          min: -50
-          max: 100
-          unit_of_measurement: "°C"
+          min: 0
+          max: 200
+          unit_of_measurement: "°F"
           step: 1
     humidity_sensors:
       name: Humidity Sensors (Optional)
@@ -123,4 +123,3 @@ action:
       entity_id: !input siren_entity
 
 mode: single
-
