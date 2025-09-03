@@ -1,7 +1,5 @@
 # Home Assistant Blueprint - Aeotec Indoor Siren 6 (ZW164) - ZWaveJS
 
-# This blueprint configures the Aeotec Indoor Siren 6 using Z-Wave JS.
-
 # Device Selection
 device_name: "Aeotec Indoor Siren 6"
 device_entity: "zwave.sensor.aeotec_indoor_siren_6"
@@ -14,39 +12,30 @@ sensor_options = [
     "temperature_sensor",
     "humidity_sensor"
 ]
-sensor_dropdown = [
-    {
-        "label": sensor_dropdown_label,
-        "options": sensor_options,
-        "entity": "sensor.zwave_sensor_trigger" # Trigger entity for each sensor. Adjust as needed.
-    }
-]
+sensor_dropdown = {
+    "label": sensor_dropdown_label,
+    "options": sensor_options
+}
 
 # Temperature Settings
 temperature_slider_label = "Temperature (Celsius/Fahrenheit)"
-temperature_slider_name = "zwave.sensor.temperature_slider" # Adjust as needed
+temperature_slider_name = "zwave.sensor.temperature_slider"
 temperature_unit_dropdown_label = "Temperature Unit:"
 temperature_unit_options = ["Celsius", "Fahrenheit"]
-temperature_unit_dropdown = [
-    {
-        "label": temperature_unit_dropdown_label,
-        "options": temperature_unit_options,
-        "entity": "sensor.temperature_unit_selector" # Trigger entity for temperature unit selection
-    }
-]
+temperature_unit_dropdown = {
+    "label": temperature_unit_dropdown_label,
+    "options": temperature_unit_options
+}
 
 
 # Humidity Settings
 humidity_slider_label = "Humidity (Celsius/Fahrenheit)"
-humidity_slider_name = "zwave.sensor.humidity_slider"  # Adjust as needed
+humidity_slider_name = "zwave.sensor.humidity_slider"
 humidity_slider_options = ["Celsius", "Fahrenheit"]
-humidity_slider_dropdown = [
-    {
-        "label": humidity_slider_label,
-        "options": humidity_slider_options,
-        "entity": "sensor.humidity_unit_selector" # Trigger entity for humidity unit selection
-    }
-]
+humidity_slider_dropdown = {
+    "label": humidity_slider_label,
+    "options": humidity_slider_options
+}
 
 # Siren Volume & Duration
 siren_volume_slider_label = "Siren Volume:"
@@ -79,13 +68,10 @@ tone_options = [
     {"value": "tone5", "label": "Tone 5"},
     {"value": "tone6", "label": "Tone 6"}
 ]
-tone_dropdown = [
-    {
-        "label": tone_dropdown_label,
-        "options": tone_options,
-        "entity": "sensor.siren_tone_selector"  # Trigger entity for siren tone selection
-    }
-]
+tone_dropdown = {
+    "label": tone_dropdown_label,
+    "options": tone_options
+}
 
 
 # Light Effect (Dropdown)
@@ -95,13 +81,11 @@ light_effect_options = [
     {"value": "effect2", "label": "Effect 2"},
     {"value": "effect3", "label": "Effect 3"}
 ]
-light_effect_dropdown = [
-    {
-        "label": light_effect_dropdown_label,
-        "options": light_effect_options,
-        "entity": "sensor.siren_light_effect_selector"  # Trigger entity for siren light effect selection
-    }
-]
+light_effect_dropdown = {
+    "label": light_effect_dropdown_label,
+    "options": light_effect_options
+}
+
 
 # Time Condition (Checkbox - Optional)
 time_condition_label = "Disable Siren at Specific Time:"
@@ -142,33 +126,6 @@ ui_config = {
                         }
                     ]
                 },
-                {
-                    "type": "vertical-stack",
-                    "children": [
-                        {
-                            "type": "vertical-stack",
-                            "children": tone_dropdown
-                        },
-                        {
-                            "type": "vertical-stack",
-                            "children": light_effect_dropdown
-                        }
-                    ]
-                },
-                {
-                    "type": "vertical-stack",
-                    "children": [
-                        {
-                            "type": "vertical-stack",
-                            "children": temperature_unit_dropdown
-                        },
-                        {
-                            "type": "vertical-stack",
-                            "children": time_condition_checkbox
-                        }
-                    ]
-                },
-
                 {
                     "type": "vertical-stack",
                     "children": [
