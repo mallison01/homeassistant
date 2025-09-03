@@ -1,5 +1,5 @@
 blueprint:
-  name: Aeotec Siren 6 - Advanced Control (Fahrenheit)
+  name: Aeotec Siren 6 - Advanced Control
   description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on selected door, temperature, or humidity sensors. This version uses Fahrenheit for temperature thresholds and provides a dropdown menu for tone selection.
   domain: automation
   author: Home Assistant Community
