@@ -1,0 +1,126 @@
+blueprint:
+  name: Aeotec Siren 6 - Advanced Control (Sensors)
+  description: Trigger an Aeotec Siren 6 (ZW164) with customizable tones, volume, and duration based on door, temperature, or humidity sensors.
+  domain: automation
+  author: Home Assistant Community
+  input:
+    siren_entity:
+      name: Siren Entity
+      description: The Z-Wave JS siren entity to control.
+      selector:
+        entity:
+          domain: siren
+    siren_tone:
+      name: Siren Tone
+      description: Select one of the 30 available tones. Refer to the Aeotec documentation for previews.
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 30
+          step: 1
+          mode: slider
+    siren_volume:
+      name: Siren Volume
+      description: Set the volume level of the siren (0-100%).
+      default: 80
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          mode: slider
+    siren_duration:
+      name: Siren Duration
+      description: The duration in seconds that the tone should play. Set to 0 for the default tone length.
+      default: 5
+      selector:
+        number:
+          min: 0
+          max: 600
+          step: 1
+          mode: box
+    door_sensors:
+      name: Door/Window Sensors (Optional)
+      description: Select door or window contact sensors that will trigger the alarm when opened.
+      default: []
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: door
+          multiple: true
+    temp_sensors:
+      name: Temperature Sensors (Optional)
+      description: Select temperature sensors to trigger the alarm.
+      default: []
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+          multiple: true
+    temp_threshold:
+      name: Temperature Threshold
+      description: Trigger the alarm when temperature goes above this value.
+      default: 30
+      selector:
+        number:
+          min: -50
+          max: 100
+          unit_of_measurement: "°C"
+          step: 1
+    humidity_sensors:
+      name: Humidity Sensors (Optional)
+      description: Select humidity sensors to trigger the alarm.
+      default: []
+      selector:
+        entity:
+          domain: sensor
+          device_class: humidity
+          multiple: true
+    humidity_threshold:
+      name: Humidity Threshold
+      description: Trigger the alarm when humidity goes above this value.
+      default: 70
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          step: 1
+
+trigger:
+  - platform: state
+    entity_id: !input door_sensors
+    to: 'on'
+  - platform: numeric_state
+    entity_id: !input temp_sensors
+    above: !input temp_threshold
+  - platform: numeric_state
+    entity_id: !input humidity_sensors
+    above: !input humidity_threshold
+
+action:
+  - service: zwave_js.set_config_parameter
+    data:
+      parameter: 37
+      value: !input siren_duration
+    target:
+      entity_id: !input siren_entity
+  - service: zwave_js.set_config_parameter
+    data:
+      parameter: 38
+      value: !input siren_volume
+    target:
+      entity_id: !input siren_entity
+  - service: zwave_js.set_config_parameter
+    data:
+      parameter: 39
+      value: !input siren_tone
+    target:
+      entity_id: !input siren_entity
+  - service: siren.turn_on
+    target:
+      entity_id: !input siren_entity
+
+mode: single
+
