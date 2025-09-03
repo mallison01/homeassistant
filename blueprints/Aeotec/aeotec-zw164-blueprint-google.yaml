@@ -48,7 +48,6 @@ blueprint:
         entity:
           domain: binary_sensor
           device_class: door
-      skip_condition: '{{ not use_door_sensor }}'
     
     use_window_sensor:
       name: Use Window Sensor
@@ -63,7 +62,6 @@ blueprint:
         entity:
           domain: binary_sensor
           device_class: window
-      skip_condition: '{{ not use_window_sensor }}'
     
     use_temperature_sensor:
       name: Use Temperature Sensor
@@ -78,7 +76,6 @@ blueprint:
         entity:
           domain: sensor
           device_class: temperature
-      skip_condition: '{{ not use_temperature_sensor }}'
     temp_units:
       name: Temperature Units
       description: Select Celsius or Fahrenheit.
@@ -89,7 +86,6 @@ blueprint:
               value: 'celsius'
             - label: Fahrenheit
               value: 'fahrenheit'
-      skip_condition: '{{ not use_temperature_sensor }}'
       default: 'celsius'
     temp_threshold:
       name: Temperature Threshold
@@ -99,7 +95,6 @@ blueprint:
           min: -40
           max: 100
           step: 1
-      skip_condition: '{{ not use_temperature_sensor }}'
       default: 30
     
     use_humidity_sensor:
@@ -115,7 +110,6 @@ blueprint:
         entity:
           domain: sensor
           device_class: humidity
-      skip_condition: '{{ not use_humidity_sensor }}'
     humidity_threshold:
       name: Humidity Threshold
       description: Trigger if the humidity goes above this percentage.
@@ -124,7 +118,6 @@ blueprint:
           min: 0
           max: 100
           step: 1
-      skip_condition: '{{ not use_humidity_sensor }}'
       default: 80
     
     # Siren and light settings
@@ -247,50 +240,47 @@ blueprint:
       from: 'off'
       to: 'on'
       id: door_sensor
-      enabled: !input use_door_sensor
     - platform: state
       entity_id: !input window_sensor
       from: 'off'
       to: 'on'
       id: window_sensor
-      enabled: !input use_window_sensor
     - platform: numeric_state
       entity_id: !input temperature_sensor
       above: !input temp_threshold
       id: temp_sensor
-      enabled: !input use_temperature_sensor
     - platform: numeric_state
       entity_id: !input humidity_sensor
       above: !input humidity_threshold
       id: humidity_sensor
-      enabled: !input use_humidity_sensor
-
+  
+  mode: single
+  
+  variables:
+    # Use trigger_id to ensure only the enabled sensors trigger the action
+    door_enabled: "{{ use_door_sensor and trigger.id == 'door_sensor' }}"
+    window_enabled: "{{ use_window_sensor and trigger.id == 'window_sensor' }}"
+    temp_enabled: "{{ use_temperature_sensor and trigger.id == 'temp_sensor' }}"
+    humidity_enabled: "{{ use_humidity_sensor and trigger.id == 'humidity_sensor' }}"
+    
   condition:
     - condition: or
       conditions:
-        - condition: and
-          conditions:
-            - condition: template
-              value: '{{ not enable_time_condition }}'
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: !input aeotec_siren
-                  attribute: alarmLevel
-                  state: 'on'
-        - condition: and
-          conditions:
-            - condition: template
-              value: '{{ enable_time_condition }}'
-            - condition: time
-              after: !input start_time
-              before: !input end_time
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: !input aeotec_siren
-                  attribute: alarmLevel
-                  state: 'on'
+        - condition: template
+          value: "{{ door_enabled or window_enabled or temp_enabled or humidity_enabled }}"
+        - condition: template
+          value: "{{ enable_time_condition }}"
+          # You might need to change the logic here based on how you want the time condition to work
+          # The current logic will enable the automation only during the specified time range.
+    - condition: or
+      conditions:
+        - condition: template
+          value: "{{ not enable_time_condition }}"
+        - condition: time
+          after: !input start_time
+          before: !input end_time
+    - condition: template
+      value: "{{ not is_state(aeotec_siren, 'on') }}"
 
   action:
     - service: zwave_js.set_value
