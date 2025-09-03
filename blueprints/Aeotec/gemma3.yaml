@@ -103,71 +103,76 @@ ui_config: {
         },
         {
             "type": "vertical-stack",
-            "children": sensor_dropdown_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": sensor_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": temperature_slider_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": temperature_unit_dropdown_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": temperature_slider_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": humidity_slider_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": humidity_slider_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": siren_volume_slider_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": siren_volume_slider_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": siren_duration_slider_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": siren_duration_slider_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": tone_dropdown_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": tone_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": light_effect_dropdown_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": light_effect_options
-        },
-        {
-            "type": "vertical-stack",
-            "children": time_condition_label
-        },
-        {
-            "type": "vertical-stack",
-            "children": time_condition_checkbox
+            "children": [
+                {
+                    "type": "label",
+                    "text": sensor_dropdown_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": sensor_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": temperature_slider_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": temperature_unit_dropdown_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": temperature_slider_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": humidity_slider_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": humidity_slider_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": siren_volume_slider_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": siren_volume_slider_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": siren_duration_slider_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": siren_duration_slider_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": tone_dropdown_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": tone_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": light_effect_dropdown_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": light_effect_options
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": time_condition_label
+                },
+                {
+                    "type": "vertical-stack",
+                    "children": time_condition_checkbox
+                }
+            ]
         }
     ]
 }
