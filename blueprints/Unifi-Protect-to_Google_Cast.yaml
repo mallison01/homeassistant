@@ -38,11 +38,11 @@ trigger:
 
 action:
   - service: camera.play_stream
-    target:
-      entity_id: !input camera
     data:
       format: hls
       media_player: !input cast_device
+    target:
+      entity_id: !input camera  
   - delay: !input time_limit
   - service: media_player.turn_off
     target:
