@@ -1,0 +1,49 @@
+blueprint:
+  name: Unifi Protect Camera Cast to Google Cast
+  description: Cast Unifi Protect camera to Google Cast when event ring happens.
+  domain: automation
+  input:
+    camera:
+      name: Camera
+      description: Select the Unifi Protect camera to cast.
+      selector:
+        entity:
+          domain: camera
+          integration: unifi_protect
+    cast_device:
+      name: Google Cast Device
+      description: Select the Google Cast device to cast to.
+      selector:
+        entity:
+          domain: media_player
+          integration: google_cast
+    time_limit:
+      name: Time Limit
+      description: Set the time limit for casting the camera stream.
+      selector:
+        number:
+          min: 10
+          max: 300
+          unit_of_measurement: seconds
+          default: 30
+
+trigger:
+  - platform: event
+    event_type: state_changed
+    event_data:
+      entity_id: !input camera
+    trigger_conditions:
+      - condition: template
+        value_template: "{{ 'ring' in trigger.event.data.new_state.attributes.event_types }}"
+
+action:
+  - service: cast.show_media
+    target:
+      entity_id: !input cast_device
+    data:
+      media_content_id: camera.stream
+      media_content_type: video/mp4
+  - delay: !input time_limit
+  - service: cast.stop_media
+    target:
+      entity_id: !input cast_device
