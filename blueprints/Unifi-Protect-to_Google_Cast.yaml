@@ -37,13 +37,15 @@ trigger:
         value_template: "{{ 'ring' in trigger.event.data.new_state.attributes.event_types }}"
 
 action:
-  - service: cast.show_media
+  - service: camera.play_stream
     target:
-      entity_id: !input cast_device
+      entity_id: !input camera
     data:
-      media_content_id: camera.stream
-      media_content_type: video/mp4
+      format: hls
+      media_player: !input cast_device
   - delay: !input time_limit
-  - service: cast.stop_media
+  - service: media_player.turn_off
     target:
       entity_id: !input cast_device
+      
+mode: single
