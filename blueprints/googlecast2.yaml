@@ -48,7 +48,7 @@ trigger:
     entity_id: !input trigger_binary_sensors
     to: 'on'
 action:
-  - wait_template: "{{ is_state_attr('automation.{{ automation.entity_id }}', 'last_triggered', None) or now() - state_attr('automation.{{ automation.entity_id }}', 'last_triggered') > timedelta(seconds=input.cool_down_delay) }}"
+  wait_template: "{{ is_state_attr('automation.{{ automation.entity_id }}', 'last_triggered', False) or now() - state_attr('automation.{{ automation.entity_id }}', 'last_triggered') > timedelta(seconds=input.cool_down_delay) }}"
   - service: camera.play_stream
     data:
       format: hls
