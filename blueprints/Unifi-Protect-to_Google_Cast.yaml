@@ -16,7 +16,7 @@ blueprint:
       selector:
         entity:
           domain: media_player
-        multiples: false
+          multiple: false
     time_limit:
       name: Time Limit
       description: Set the time limit for casting the camera stream.
