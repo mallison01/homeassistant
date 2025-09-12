@@ -9,7 +9,7 @@ blueprint:
       selector:
         entity:
           domain: camera
-          integration: unifi_protect
+          integration: unifiprotect
     cast_device:
       name: Google Cast Device
       description: Select the Google Cast device to cast to.
