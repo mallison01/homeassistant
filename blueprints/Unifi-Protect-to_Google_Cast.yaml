@@ -1,6 +1,6 @@
 blueprint:
-  name: Unifi Protect Camera Cast to Google Cast
-  description: Cast Unifi Protect camera to Google Cast when event ring happens.
+  name: Unifi Protect Camera Cast to Google Display
+  description: Cast Unifi Protect camera to Google Display for chosen triggers.
   domain: automation
   input:
     camera:
