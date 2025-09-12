@@ -1,6 +1,6 @@
 blueprint:
-  name: Unifi Protect Camera Cast to Google Display
-  description: Cast Unifi Protect camera to Google Display based on binary sensor state.
+  name: Unifi Protect Camera Cast to Google Displays
+  description: Cast Unifi Protect camera to Google Display based on any of the selected triggers.
   domain: automation
   input:
     camera:
@@ -26,19 +26,18 @@ blueprint:
           min: 10
           max: 300
           unit_of_measurement: seconds
-    trigger_binary_sensor:
-      name: Trigger Binary Sensor
-      description: Select the binary sensor that triggers the automation.
+    trigger_binary_sensors:
+      name: Trigger Binary Sensors
+      description: Select one or more binary sensors that trigger the automation.
       selector:
         entity:
           domain: binary_sensor
           integration: unifiprotect
-
+          multiple: true
 trigger:
   - platform: state
-    entity_id: !input trigger_binary_sensor
+    entity_id: !input trigger_binary_sensors
     to: 'on'
-
 action:
   - service: camera.play_stream
     data:
