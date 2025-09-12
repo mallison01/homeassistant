@@ -16,7 +16,7 @@ blueprint:
       selector:
         entity:
           domain: media_player
-          integration: google_cast
+          integration: cast
     time_limit:
       name: Time Limit
       description: Set the time limit for casting the camera stream.
