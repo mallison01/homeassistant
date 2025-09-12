@@ -28,13 +28,12 @@ blueprint:
           unit_of_measurement: seconds
 
 trigger:
-  - platform: event
-    event_type: state_changed
-    event_data:
-      entity_id: !input camera
-    trigger_conditions:
-      - condition: template
-        value_template: "{{ 'ring' in trigger.event.data.new_state.attributes.event_types }}"
+  - platform: state
+    entity_id: !input camera
+    to: "on" # Trigger when the camera state changes to "on"
+    variables:
+      event_types: "{{ state_attr(trigger.entity_id, 'event_types') }}"
+    condition: "{{ event_types is not none and 'ring' in event_types }}"
 
 action:
   - service: camera.play_stream
