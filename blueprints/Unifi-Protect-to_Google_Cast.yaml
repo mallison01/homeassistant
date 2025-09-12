@@ -11,14 +11,12 @@ blueprint:
           domain: camera
           integration: unifiprotect
     cast_device:
-      name: Google Cast Device or Group
-      description: Select the Google Cast device or Group to cast to.
+      name: Cast Device
+      description: Select a Google Cast device or a media player group.
       selector:
         entity:
-          filter:
-            - integration: cast
-            - domain: media_player
-                platform: group
+          domain: media_player
+          multiples: false
     time_limit:
       name: Time Limit
       description: Set the time limit for casting the camera stream.
