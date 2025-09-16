@@ -14,7 +14,6 @@ blueprint:
           multiple: true
           filter:
             - domain: binary_sensor
-            - domain: sensor
     
     # Light Control
     light_control_type:
@@ -63,13 +62,10 @@ blueprint:
     timer_duration:
       name: Timer Duration
       description: How long to wait before turning off lights after all sensors are clear
-      default: 300
+      default:
+        minutes: 5
       selector:
-        number:
-          min: 30
-          max: 3600
-          step: 30
-          unit_of_measurement: seconds
+        duration:
     
     # Optional: Device Tracking
     enable_device_tracking:
@@ -88,6 +84,7 @@ blueprint:
           filter:
             - domain: device_tracker
             - domain: person
+      depends_on: enable_device_tracking
     
     device_zone:
       name: Zone for Device Check
@@ -95,6 +92,7 @@ blueprint:
       default: "home"
       selector:
         text:
+      depends_on: enable_device_tracking
     
     device_presence_required:
       name: Device Must Be Present
@@ -102,6 +100,7 @@ blueprint:
       default: true
       selector:
         boolean:
+      depends_on: enable_device_tracking
     
     # Optional: Time Restrictions
     enable_time_restriction:
@@ -117,6 +116,7 @@ blueprint:
       default: "00:00:00"
       selector:
         time:
+      depends_on: enable_time_restriction
     
     end_time:
       name: End Time
@@ -124,6 +124,7 @@ blueprint:
       default: "23:59:59"
       selector:
         time:
+      depends_on: enable_time_restriction
     
     # Optional: Day Restrictions
     enable_day_restriction:
@@ -162,6 +163,7 @@ blueprint:
               value: "sat"
             - label: "Sunday"
               value: "sun"
+      depends_on: enable_day_restriction
     
     # Optional: Light Sensor
     enable_light_sensor:
@@ -179,6 +181,7 @@ blueprint:
         entity:
           filter:
             - device_class: illuminance
+      depends_on: enable_light_sensor
     
     light_threshold:
       name: Light Threshold
@@ -190,6 +193,7 @@ blueprint:
           max: 1000
           step: 10
           unit_of_measurement: lux
+      depends_on: enable_light_sensor
     
     # Optional: Occupancy Sensor
     enable_occupancy_sensor:
@@ -208,6 +212,7 @@ blueprint:
           multiple: true
           filter:
             - domain: binary_sensor
+      depends_on: enable_occupancy_sensor
     
     # Optional: Wait for All Sensors
     wait_for_all_sensors:
@@ -236,6 +241,7 @@ blueprint:
             - domain: light
             - domain: switch
             - domain: fan
+      depends_on: enable_extra_turnoff
     
     extra_off_scenes:
       name: Extra Scenes to Activate
@@ -246,6 +252,7 @@ blueprint:
           multiple: true
           filter:
             - domain: scene
+      depends_on: enable_extra_turnoff
 
 variables:
   motion_sensors: !input motion_sensors
@@ -333,9 +340,13 @@ action:
             conditions:
               - condition: template
                 value_template: "{{ not enable_light_sensor }}"
-              - condition: numeric_state
-                entity_id: !input light_sensor
-                below: !input light_threshold
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_light_sensor and light_sensor != '' }}"
+                  - condition: numeric_state
+                    entity_id: !input light_sensor
+                    below: !input light_threshold
         sequence:
           - choose:
               # Turn on individual devices
@@ -381,8 +392,7 @@ action:
                       {{ occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 }}
           
           # Wait for timer duration
-          - delay:
-              seconds: !input timer_duration
+          - delay: !input timer_duration
           
           # Turn off lights or activate off scene
           - choose:
