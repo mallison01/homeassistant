@@ -367,9 +367,9 @@ action:
           1
         {% endif %}
       value: "{{ (light_effect | int) * 16777216 }}"
-    variables:
-      light_effect: !input light_effect
-      app_type: !input application_type
+    #variables:
+    #  light_effect: !input light_effect
+    #  app_type: !input application_type
   
   # Turn on the siren (basic activation)
   - service: switch.turn_on
