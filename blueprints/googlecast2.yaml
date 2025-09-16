@@ -1,6 +1,38 @@
 blueprint:
   name: Unifi Protect Camera Cast to Google Display with Optional Cool-Down
-  description: Cast Unifi Protect camera to Google Display based on triggers with an optional cool-down delay.
+  description: >
+     # Cast Unifi Protect camera to Google Display based on triggers with an optional cool-down delay.
+
+     Cast Unifi Protect camera to Google Display based on triggers with an optional cool-down delay.
+
+     <details>
+     <summary><b>Instructions:</b></summary>
+
+    
+      - **Trigger:**
+        - The trigger can be the doorbell buton or any other binary sensor from the Unifi Camera.
+
+      - **Camera:**
+          - Select a single Unifi Camera (Recommend to use the Low Resolution Stream (insecure) and also set the stream to preload.
+      
+      - **Cast Device:**
+          - Select a single Cast device or Group.
+      
+      - **Volume Level:**
+          - Adjust your desired volume level.
+
+      - **Time Limit:**
+        - This is the amount of time the stream will be displayed on the Cast Devices.
+
+      - **Trigger Binary Sensors:**
+        - Select One or more Binary Sensors from the Unifi Camera.
+
+      - **Cool-Down Delay:**
+        - This is the amount of time that needs to pass before the automation will trigger again.
+
+      
+      </details>           
+  
   domain: automation
   input:
     camera:
