@@ -271,7 +271,7 @@ blueprint:
     application_type:
       name: Application Type
       description: Choose the application context for different trigger behaviors
-      default: security
+      default: browse
       selector:
         select:
           options:
@@ -294,6 +294,7 @@ variables:
   temp_condition: !input temperature_condition
   humidity_condition: !input humidity_condition
   app_type: !input application_type
+  light_effect: !input light_effect
   endpoint_map:
     security: 7
     environment: 6
