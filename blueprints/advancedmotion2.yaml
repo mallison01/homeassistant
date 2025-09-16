@@ -68,151 +68,167 @@ blueprint:
         duration:
     
     # Optional: Device Tracking
-    enable_device_tracking:
-      name: Enable Device Tracking
-      description: Enable device presence checking
-      default: false
-      selector:
-        boolean:
-    
-    tracked_device:
-      name: Device to Track
-      description: Device that must be present/absent for automation to run
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: device_tracker
-            - domain: person
-      depends_on: enable_device_tracking
-    
-    device_zone:
-      name: Zone for Device Check
-      description: Zone where device should be present for automation to run
-      default: "home"
-      selector:
-        text:
-      depends_on: enable_device_tracking
-    
-    device_presence_required:
-      name: Device Must Be Present
-      description: If enabled, device must be in zone. If disabled, device must NOT be in zone
-      default: true
-      selector:
-        boolean:
-      depends_on: enable_device_tracking
+    device_tracking_options:
+      name: Device Tracking Options
+      description: Control automation based on device presence
+      collapsed: true
+      input:
+        enable_device_tracking:
+          name: Enable Device Tracking
+          description: Enable device presence checking
+          default: false
+          selector:
+            boolean:
+        
+        tracked_device:
+          name: Device to Track
+          description: Device that must be present/absent for automation to run
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: device_tracker
+                - domain: person
+        
+        device_zone:
+          name: Zone for Device Check
+          description: Zone where device should be present for automation to run
+          default: "home"
+          selector:
+            text:
+        
+        device_presence_required:
+          name: Device Must Be Present
+          description: If enabled, device must be in zone. If disabled, device must NOT be in zone
+          default: true
+          selector:
+            boolean:
     
     # Optional: Time Restrictions
-    enable_time_restriction:
-      name: Enable Time Restrictions
-      description: Only run automation between certain times
-      default: false
-      selector:
-        boolean:
-    
-    start_time:
-      name: Start Time
-      description: Earliest time to run automation
-      default: "00:00:00"
-      selector:
-        time:
-      depends_on: enable_time_restriction
-    
-    end_time:
-      name: End Time
-      description: Latest time to run automation
-      default: "23:59:59"
-      selector:
-        time:
-      depends_on: enable_time_restriction
+    time_restriction_options:
+      name: Time Restriction Options
+      description: Control when automation runs based on time of day
+      collapsed: true
+      input:
+        enable_time_restriction:
+          name: Enable Time Restrictions
+          description: Only run automation between certain times
+          default: false
+          selector:
+            boolean:
+        
+        start_time:
+          name: Start Time
+          description: Earliest time to run automation
+          default: "00:00:00"
+          selector:
+            time:
+        
+        end_time:
+          name: End Time
+          description: Latest time to run automation
+          default: "23:59:59"
+          selector:
+            time:
     
     # Optional: Day Restrictions
-    enable_day_restriction:
-      name: Enable Day of Week Restrictions
-      description: Only run automation on selected days
-      default: false
-      selector:
-        boolean:
-    
-    allowed_days:
-      name: Allowed Days
-      description: Days when automation is allowed to run
-      default:
-        - mon
-        - tue
-        - wed
-        - thu
-        - fri
-        - sat
-        - sun
-      selector:
-        select:
-          multiple: true
-          options:
-            - label: "Monday"
-              value: "mon"
-            - label: "Tuesday"
-              value: "tue"
-            - label: "Wednesday"
-              value: "wed"
-            - label: "Thursday"
-              value: "thu"
-            - label: "Friday"
-              value: "fri"
-            - label: "Saturday"
-              value: "sat"
-            - label: "Sunday"
-              value: "sun"
-      depends_on: enable_day_restriction
+    day_restriction_options:
+      name: Day of Week Restriction Options
+      description: Control which days automation runs
+      collapsed: true
+      input:
+        enable_day_restriction:
+          name: Enable Day of Week Restrictions
+          description: Only run automation on selected days
+          default: false
+          selector:
+            boolean:
+        
+        allowed_days:
+          name: Allowed Days
+          description: Days when automation is allowed to run
+          default:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: "Monday"
+                  value: "mon"
+                - label: "Tuesday"
+                  value: "tue"
+                - label: "Wednesday"
+                  value: "wed"
+                - label: "Thursday"
+                  value: "thu"
+                - label: "Friday"
+                  value: "fri"
+                - label: "Saturday"
+                  value: "sat"
+                - label: "Sunday"
+                  value: "sun"
     
     # Optional: Light Sensor
-    enable_light_sensor:
-      name: Enable Light Sensor
-      description: Only run when light level is below threshold
-      default: false
-      selector:
-        boolean:
-    
-    light_sensor:
-      name: Light Sensor
-      description: Sensor to check light level
-      default: ""
-      selector:
-        entity:
-          filter:
-            - device_class: illuminance
-      depends_on: enable_light_sensor
-    
-    light_threshold:
-      name: Light Threshold
-      description: Light level below which automation runs
-      default: 100
-      selector:
-        number:
-          min: 0
-          max: 1000
-          step: 10
-          unit_of_measurement: lux
-      depends_on: enable_light_sensor
+    light_sensor_options:
+      name: Light Sensor Options
+      description: Control automation based on ambient light level
+      collapsed: true
+      input:
+        enable_light_sensor:
+          name: Enable Light Sensor
+          description: Only run when light level is below threshold
+          default: false
+          selector:
+            boolean:
+        
+        light_sensor:
+          name: Light Sensor
+          description: Sensor to check light level
+          default: ""
+          selector:
+            entity:
+              filter:
+                - device_class: illuminance
+        
+        light_threshold:
+          name: Light Threshold
+          description: Light level below which automation runs
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 1000
+              step: 10
+              unit_of_measurement: lux
     
     # Optional: Occupancy Sensor
-    enable_occupancy_sensor:
-      name: Enable Occupancy Detection
-      description: Use additional sensor to detect room occupancy
-      default: false
-      selector:
-        boolean:
-    
-    occupancy_sensors:
-      name: Occupancy Sensors
-      description: Additional sensors to detect room occupancy (lights stay on while these are active)
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: binary_sensor
-      depends_on: enable_occupancy_sensor
+    occupancy_sensor_options:
+      name: Occupancy Detection Options
+      description: Use additional sensors to detect room occupancy
+      collapsed: true
+      input:
+        enable_occupancy_sensor:
+          name: Enable Occupancy Detection
+          description: Use additional sensor to detect room occupancy
+          default: false
+          selector:
+            boolean:
+        
+        occupancy_sensors:
+          name: Occupancy Sensors
+          description: Additional sensors to detect room occupancy (lights stay on while these are active)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: binary_sensor
     
     # Optional: Wait for All Sensors
     wait_for_all_sensors:
@@ -223,36 +239,39 @@ blueprint:
         boolean:
     
     # Optional: Extra Devices to Turn Off
-    enable_extra_turnoff:
-      name: Enable Extra Turn Off
-      description: Turn off additional devices/scenes when timer expires
-      default: false
-      selector:
-        boolean:
-    
-    extra_devices:
-      name: Extra Devices to Turn Off
-      description: Additional devices to turn off when automation ends
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: light
-            - domain: switch
-            - domain: fan
-      depends_on: enable_extra_turnoff
-    
-    extra_off_scenes:
-      name: Extra Scenes to Activate
-      description: Additional scenes to activate when automation ends
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: scene
-      depends_on: enable_extra_turnoff
+    extra_turnoff_options:
+      name: Extra Turn Off Options
+      description: Turn off additional devices when automation ends
+      collapsed: true
+      input:
+        enable_extra_turnoff:
+          name: Enable Extra Turn Off
+          description: Turn off additional devices/scenes when timer expires
+          default: false
+          selector:
+            boolean:
+        
+        extra_devices:
+          name: Extra Devices to Turn Off
+          description: Additional devices to turn off when automation ends
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+                - domain: switch
+                - domain: fan
+        
+        extra_off_scenes:
+          name: Extra Scenes to Activate
+          description: Additional scenes to activate when automation ends
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: scene
 
 variables:
   motion_sensors: !input motion_sensors
@@ -261,24 +280,24 @@ variables:
   off_scene: !input off_scene
   light_control_type: !input light_control_type
   timer_duration: !input timer_duration
-  enable_device_tracking: !input enable_device_tracking
-  tracked_device: !input tracked_device
-  device_zone: !input device_zone
-  device_presence_required: !input device_presence_required
-  enable_time_restriction: !input enable_time_restriction
-  start_time: !input start_time
-  end_time: !input end_time
-  enable_day_restriction: !input enable_day_restriction
-  allowed_days: !input allowed_days
-  enable_light_sensor: !input enable_light_sensor
-  light_sensor: !input light_sensor
-  light_threshold: !input light_threshold
-  enable_occupancy_sensor: !input enable_occupancy_sensor
-  occupancy_sensors: !input occupancy_sensors
+  enable_device_tracking: !input device_tracking_options.enable_device_tracking
+  tracked_device: !input device_tracking_options.tracked_device
+  device_zone: !input device_tracking_options.device_zone
+  device_presence_required: !input device_tracking_options.device_presence_required
+  enable_time_restriction: !input time_restriction_options.enable_time_restriction
+  start_time: !input time_restriction_options.start_time
+  end_time: !input time_restriction_options.end_time
+  enable_day_restriction: !input day_restriction_options.enable_day_restriction
+  allowed_days: !input day_restriction_options.allowed_days
+  enable_light_sensor: !input light_sensor_options.enable_light_sensor
+  light_sensor: !input light_sensor_options.light_sensor
+  light_threshold: !input light_sensor_options.light_threshold
+  enable_occupancy_sensor: !input occupancy_sensor_options.enable_occupancy_sensor
+  occupancy_sensors: !input occupancy_sensor_options.occupancy_sensors
   wait_for_all_sensors: !input wait_for_all_sensors
-  enable_extra_turnoff: !input enable_extra_turnoff
-  extra_devices: !input extra_devices
-  extra_off_scenes: !input extra_off_scenes
+  enable_extra_turnoff: !input extra_turnoff_options.enable_extra_turnoff
+  extra_devices: !input extra_turnoff_options.extra_devices
+  extra_off_scenes: !input extra_turnoff_options.extra_off_scenes
 
 trigger:
   - platform: state
