@@ -17,6 +17,15 @@ blueprint:
         entity:
           domain: media_player
           multiple: false
+    volume_level:
+      name: Volume Level
+      description: Set the volume for the cast device.
+      default: 50
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: '%'
     time_limit:
       name: Time Limit
       description: Set the time limit for casting the camera stream.
@@ -55,6 +64,11 @@ action:
       {% else %}
         {{ now() - last_run > timedelta(seconds=input.cool_down_delay) }}
       {% endif %}
+  - service: media_player.volume_set
+    data:
+      volume_level: "{{ states(volume_level) | int / 100 }}"
+    target:
+      entity_id: !input cast_device
   - service: camera.play_stream
     data:
       format: hls
