@@ -329,13 +329,12 @@ action:
             conditions:
               - condition: template
                 value_template: "{{ not enable_light_sensor }}"
-              - condition: and
-                conditions:
-                  - condition: template
-                    value_template: "{{ enable_light_sensor and light_sensor != '' }}"
-                  - condition: numeric_state
-                    entity_id: !input light_sensor
-                    below: !input light_threshold
+              - condition: template
+                value_template: "{{ enable_light_sensor and light_sensor != '' }}"
+              - condition: template
+                value_template: >
+                  {{ enable_light_sensor and light_sensor != '' and 
+                     states(light_sensor)|float(1000) < light_threshold }}
         sequence:
           - choose:
               # Turn on individual devices
