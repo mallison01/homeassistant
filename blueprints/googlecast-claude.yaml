@@ -83,16 +83,12 @@ trigger:
 condition:
   - condition: template
     value_template: >
-      {% set cool_down = input_number.cool_down_delay | default(0) %}
-      {% if cool_down == 0 %}
+      {% set cool_down = input('cool_down_delay') %}
+      {% set last_run = state_attr(this.entity_id, 'last_triggered') %}
+      {% if last_run is none %}
         true
       {% else %}
-        {% set last_run = state_attr(this.entity_id, 'last_triggered') %}
-        {% if last_run is none %}
-          true
-        {% else %}
-          {{ (now() - last_run).total_seconds() >= cool_down }}
-        {% endif %}
+        {{ (now() - last_run).total_seconds() >= cool_down }}
       {% endif %}
 action:
   - variables:
