@@ -89,6 +89,9 @@ trigger:
     entity_id: !input trigger_binary_sensors
     to: 'on'
 action:
+  - variables:
+      volume_level_input: !input volume_level
+      volume_level_normalized: "{{ (volume_level_input | float) / 100 }}"
   - wait_template: >
       {% set last_run = state_attr('automation.{{ automation.entity_id }}', 'last_triggered') %}
       {% if last_run is none %}
@@ -96,8 +99,6 @@ action:
       {% else %}
         {{ now() - last_run > timedelta(seconds=input.cool_down_delay) }}
       {% endif %}
-  - variables:
-      volume_level_normalized: "{{ (!input volume_level | float) / 100 }}"
   - service: media_player.volume_set
     data:
       volume_level: "{{ volume_level_normalized }}"
