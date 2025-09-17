@@ -382,6 +382,23 @@ action:
           # Wait for timer duration
           - delay: !input timer_duration
           
+          # Check if occupancy sensors are still active and restart if needed
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ enable_occupancy_sensor }}"
+                  - condition: template
+                    value_template: >
+                      {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
+                      {{ occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length > 0 }}
+                sequence:
+                  # Restart the timer - wait for occupancy sensors to clear again
+                  - wait_template: >
+                      {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
+                      {{ occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 }}
+                  # Wait for the timer duration again
+                  - delay: !input timer_duration
+          
           # Turn off lights or activate off scene
           - choose:
               # Turn off individual devices
