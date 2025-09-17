@@ -98,7 +98,7 @@ action:
       {% endif %}
   - service: media_player.volume_set
     data:
-      volume_level: "{{ (volume_level / 100) | float }}"
+      volume_level: "{{ (input.volume_level / 100) | float }}"
     target:
       entity_id: !input cast_device
   - service: camera.play_stream
