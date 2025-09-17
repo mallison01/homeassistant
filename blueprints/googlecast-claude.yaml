@@ -80,20 +80,19 @@ trigger:
   - platform: state
     entity_id: !input trigger_binary_sensors
     to: 'on'
-condition:
-  - condition: template
-    value_template: >
-      {% set cool_down = input('cool_down_delay') %}
-      {% set last_run = state_attr(this.entity_id, 'last_triggered') %}
-      {% if last_run is none %}
-        true
-      {% else %}
-        {{ (now() - last_run).total_seconds() >= cool_down }}
-      {% endif %}
 action:
   - variables:
       volume_level_input: !input volume_level
       volume_level_normalized: "{{ (volume_level_input | float) / 100.0 }}"
+      cool_down_delay: !input cool_down_delay
+  - condition: template
+    value_template: >
+      {% set last_run = state_attr(this.entity_id, 'last_triggered') %}
+      {% if last_run is none %}
+        true
+      {% else %}
+        {{ (now() - last_run).total_seconds() >= cool_down_delay }}
+      {% endif %}
   - service: media_player.volume_set
     data:
       volume_level: "{{ volume_level_normalized }}"
