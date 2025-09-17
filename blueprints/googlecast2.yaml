@@ -89,8 +89,6 @@ trigger:
     entity_id: !input trigger_binary_sensors
     to: 'on'
 action:
-  - variables:
-      volume_level_input: "{{ (volume_level / 100) | float }}"
   - wait_template: >
       {% set last_run = state_attr('automation.{{ automation.entity_id }}', 'last_triggered') %}
       {% if last_run is none %}
@@ -100,7 +98,7 @@ action:
       {% endif %}
   - service: media_player.volume_set
     data:
-      volume_level: "{{ volume_level_input }}"
+      volume_level: "{{ (volume_level / 100) | float }}"
     target:
       entity_id: !input cast_device
   - service: camera.play_stream
