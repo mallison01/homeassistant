@@ -96,9 +96,11 @@ action:
       {% else %}
         {{ now() - last_run > timedelta(seconds=input.cool_down_delay) }}
       {% endif %}
+  - variables:
+      volume_level_normalized: "{{ (!input volume_level | float) / 100 }}"
   - service: media_player.volume_set
     data:
-      volume_level: "{{ (input.volume_level / 100) | float }}"
+      volume_level: "{{ volume_level_normalized }}"
     target:
       entity_id: !input cast_device
   - service: camera.play_stream
