@@ -82,24 +82,26 @@ trigger:
     entity_id: !input trigger_binary_sensors
     to: 'on'
 action:
+  - condition: template
+    value_template: >
+      {% if not (input.enable_cool_down | default(false)) %}
+        true
+      {% else %}
+        {% set last_run = state_attr(trigger.to_state.context.parent_id, 'last_triggered') %}
+        {% if last_run is none %}
+          true
+        {% else %}
+          {% set cool_down_duration = input.cool_down_delay %}
+          {% set cool_down_seconds = cool_down_duration.total_seconds() | int %}
+          {% set elapsed_seconds = (now() - last_run).total_seconds() | int %}
+          {{ elapsed_seconds >= cool_down_seconds }}
+        {% endif %}
+      {% endif %}
   - variables:
       volume_level_input: !input volume_level
       volume_level_normalized: "{{ (volume_level_input | float) / 100 }}"
       enable_cool_down: !input enable_cool_down
       cool_down_delay: !input cool_down_delay
-  - condition: template
-    value_template: >
-      {% if not enable_cool_down %}
-        true
-      {% else %}
-        {% set last_run = state_attr('automation.' ~ this.entity_id, 'last_triggered') %}
-        {% if last_run is none %}
-          true
-        {% else %}
-          {% set cool_down_seconds = cool_down_delay.total_seconds() %}
-          {{ (now() - last_run).total_seconds() > cool_down_seconds }}
-        {% endif %}
-      {% endif %}
   - service: media_player.volume_set
     data:
       volume_level: "{{ volume_level_normalized }}"
