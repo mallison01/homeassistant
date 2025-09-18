@@ -85,18 +85,19 @@ action:
   - variables:
       volume_level_input: !input volume_level
       volume_level_normalized: "{{ (volume_level_input | float) / 100 }}"
+      enable_cool_down: !input enable_cool_down
+      cool_down_delay: !input cool_down_delay
   - if:
       - condition: template
-        value_template: "{{ input.enable_cool_down | default(false) }}"
+        value_template: "{{ enable_cool_down | default(false) }}"
     then:
       - condition: template
         value_template: >
-          {% set automation_entity = 'automation.' + (this.entity_id | replace('automation.', '')) %}
-          {% set last_triggered = state_attr(automation_entity, 'last_triggered') %}
+          {% set last_triggered = this.attributes.last_triggered %}
           {% if last_triggered is none %}
             true
           {% else %}
-            {% set cool_down_seconds = (input.cool_down_delay.hours | default(0) * 3600) + (input.cool_down_delay.minutes | default(0) * 60) + (input.cool_down_delay.seconds | default(0)) %}
+            {% set cool_down_seconds = (cool_down_delay.hours | default(0) * 3600) + (cool_down_delay.minutes | default(0) * 60) + (cool_down_delay.seconds | default(0)) %}
             {% set elapsed = (now() - last_triggered).total_seconds() %}
             {{ elapsed >= cool_down_seconds }}
           {% endif %}
