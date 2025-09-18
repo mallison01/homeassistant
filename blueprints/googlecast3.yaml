@@ -2,16 +2,12 @@ blueprint:
   name: Camera Cast to Google Display with Optional Cool-Down
   description: >
      # Cast camera to Google Display based on triggers with an optional cool-down delay.
-
      Cast camera to Google Display based on triggers with an optional cool-down delay.
-
      <details>
      <summary><b>Instructions:</b></summary>
-
     
       - **Trigger:**
         - The trigger can be the doorbell buton or any other binary sensor from the Unifi Camera.
-
       - **Camera:**
           - Select a single Camera (Recommend to use the Low Resolution Stream (insecure) and also set the stream to preload.
       
@@ -20,16 +16,12 @@ blueprint:
       
       - **Volume Level:**
           - Adjust your desired volume level.
-
       - **Time Limit:**
         - This is the amount of time the stream will be displayed on the Cast Devices.
-
       - **Trigger Binary Sensors:**
         - Select One or more Binary Sensors from the Unifi Camera.
-
       - **Cool-Down Delay:**
         - This is the amount of time that needs to pass before the automation will trigger again.
-
       
       </details>           
   
@@ -60,12 +52,10 @@ blueprint:
     time_limit:
       name: Time Limit
       description: Set the time limit for casting the camera stream.
-      default: 30
+      default:
+        seconds: 45
       selector:
-        number:
-          min: 10
-          max: 300
-          unit_of_measurement: seconds
+        duration:
     trigger_binary_sensors:
       name: Trigger Binary Sensors
       description: Select multiple binary sensors that trigger the automation.
@@ -77,12 +67,10 @@ blueprint:
     cool_down_delay:
       name: Cool-Down Delay (optional)
       description: Set the cool-down delay after triggering.
-      default: None
+      default:
+        minutes: 5
       selector:
-        number:
-          min: 300
-          max: 3600
-          unit_of_measurement: seconds
+        duration:
 trigger:
   - platform: state
     entity_id: !input trigger_binary_sensors
