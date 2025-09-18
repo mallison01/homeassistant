@@ -82,26 +82,58 @@ trigger:
     entity_id: !input trigger_binary_sensors
     to: 'on'
 action:
-  - condition: template
-    value_template: >
-      {% if not (input.enable_cool_down | default(false)) %}
-        true
-      {% else %}
-        {% set last_run = state_attr(trigger.to_state.context.parent_id, 'last_triggered') %}
-        {% if last_run is none %}
-          true
-        {% else %}
-          {% set cool_down_duration = input.cool_down_delay %}
-          {% set cool_down_seconds = cool_down_duration.total_seconds() | int %}
-          {% set elapsed_seconds = (now() - last_run).total_seconds() | int %}
-          {{ elapsed_seconds >= cool_down_seconds }}
-        {% endif %}
-      {% endif %}
   - variables:
       volume_level_input: !input volume_level
       volume_level_normalized: "{{ (volume_level_input | float) / 100 }}"
-      enable_cool_down: !input enable_cool_down
-      cool_down_delay: !input cool_down_delay
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ not (input.enable_cool_down | default(false)) }}"
+        sequence:
+          - service: media_player.volume_set
+            data:
+              volume_level: "{{ volume_level_normalized }}"
+            target:
+              entity_id: !input cast_device
+          - service: camera.play_stream
+            data:
+              format: hls
+              media_player: !input cast_device
+            target:
+              entity_id: !input camera  
+          - delay: !input time_limit
+          - service: media_player.turn_off
+            target:
+              entity_id: !input cast_device
+      - conditions:
+          - condition: template
+            value_template: "{{ input.enable_cool_down | default(false) }}"
+        sequence:
+          - condition: template
+            value_template: >
+              {% set last_triggered = this.attributes.last_triggered %}
+              {% if last_triggered is none %}
+                true
+              {% else %}
+                {% set cool_down_seconds = (input.cool_down_delay.hours * 3600) + (input.cool_down_delay.minutes * 60) + (input.cool_down_delay.seconds) %}
+                {% set elapsed = (now() - last_triggered).total_seconds() %}
+                {{ elapsed >= cool_down_seconds }}
+              {% endif %}
+          - service: media_player.volume_set
+            data:
+              volume_level: "{{ volume_level_normalized }}"
+            target:
+              entity_id: !input cast_device
+          - service: camera.play_stream
+            data:
+              format: hls
+              media_player: !input cast_device
+            target:
+              entity_id: !input camera  
+          - delay: !input time_limit
+          - service: media_player.turn_off
+            target:
+              entity_id: !input cast_device
   - service: media_player.volume_set
     data:
       volume_level: "{{ volume_level_normalized }}"
