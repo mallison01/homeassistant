@@ -64,8 +64,14 @@ blueprint:
           domain: binary_sensor
           integration: unifiprotect
           multiple: true
+    enable_cool_down:
+      name: Enable Cool-Down Delay
+      description: Enable or disable the cool-down delay feature.
+      default: false
+      selector:
+        boolean:
     cool_down_delay:
-      name: Cool-Down Delay (optional)
+      name: Cool-Down Delay
       description: Set the cool-down delay after triggering.
       default:
         minutes: 5
@@ -79,12 +85,20 @@ action:
   - variables:
       volume_level_input: !input volume_level
       volume_level_normalized: "{{ (volume_level_input | float) / 100 }}"
-  - wait_template: >
-      {% set last_run = state_attr('automation.{{ automation.entity_id }}', 'last_triggered') %}
-      {% if last_run is none %}
+      enable_cool_down: !input enable_cool_down
+      cool_down_delay: !input cool_down_delay
+  - condition: template
+    value_template: >
+      {% if not enable_cool_down %}
         true
       {% else %}
-        {{ now() - last_run > timedelta(seconds=input.cool_down_delay) }}
+        {% set last_run = state_attr('automation.' ~ this.entity_id, 'last_triggered') %}
+        {% if last_run is none %}
+          true
+        {% else %}
+          {% set cool_down_seconds = cool_down_delay.total_seconds() %}
+          {{ (now() - last_run).total_seconds() > cool_down_seconds }}
+        {% endif %}
       {% endif %}
   - service: media_player.volume_set
     data:
