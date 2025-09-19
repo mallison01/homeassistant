@@ -359,100 +359,77 @@ action:
           - condition: trigger
             id: "motion_cleared"
         sequence:
-          # Combined wait for all sensors and timer with continuous monitoring
-          - repeat:
-              while:
-                - condition: or
-                  conditions:
-                    # Check if we need to wait for all motion sensors to be clear
-                    - condition: and
-                      conditions:
-                        - condition: template
-                          value_template: "{{ wait_for_all_sensors }}"
-                        - condition: template
-                          value_template: >
-                            {% set sensors = binary_sensors if binary_sensors is iterable and binary_sensors is not string else [binary_sensors] %}
-                            {{ sensors | select('is_state', ['on', 'open', 'detected']) | list | length > 0 }}
-                    # Check if any occupancy sensors are active
-                    - condition: and
-                      conditions:
-                        - condition: template
-                          value_template: "{{ enable_occupancy_sensor }}"
-                        - condition: template
-                          value_template: >
-                            {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
-                            {{ occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length > 0 }}
-              sequence:
-                # Wait for either all motion sensors to clear OR all occupancy sensors to clear
-                - wait_template: >
-                    {% set motion_clear = true %}
-                    {% set occupancy_clear = true %}
-                    
-                    {% if wait_for_all_sensors %}
-                      {% set sensors = binary_sensors if binary_sensors is iterable and binary_sensors is not string else [binary_sensors] %}
-                      {% set motion_clear = sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
-                    {% endif %}
-                    
-                    {% if enable_occupancy_sensor %}
-                      {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
-                      {% set occupancy_clear = occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
-                    {% endif %}
-                    
-                    {{ motion_clear and occupancy_clear }}
+          # Wait for all motion sensors to clear first (if enabled)
+          - if:
+              - condition: template
+                value_template: "{{ wait_for_all_sensors }}"
+            then:
+              - wait_template: >
+                  {% set sensors = binary_sensors if binary_sensors is iterable and binary_sensors is not string else [binary_sensors] %}
+                  {{ sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 }}
           
-          # Timer with sensor monitoring - will reset if any sensor activates
+          # Wait for occupancy sensors to clear (if enabled)
+          - if:
+              - condition: template
+                value_template: "{{ enable_occupancy_sensor and occupancy_sensors|length > 0 }}"
+            then:
+              - wait_template: >
+                  {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
+                  {{ occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 }}
+          
+          # Start the countdown timer with monitoring
           - repeat:
-              while:
-                - condition: template
-                  value_template: "{{ true }}"
               sequence:
-                # Wait for the timer duration, but with sensor monitoring
+                # Build the trigger list dynamically based on enabled features
+                - variables:
+                    trigger_list: >
+                      {% set triggers = [] %}
+                      {% set motion_sensors = binary_sensors if binary_sensors is iterable and binary_sensors is not string else [binary_sensors] %}
+                      {% for sensor in motion_sensors %}
+                        {% set triggers = triggers + [{'platform': 'state', 'entity_id': sensor, 'to': ['on', 'open', 'detected']}] %}
+                      {% endfor %}
+                      {% if enable_occupancy_sensor and occupancy_sensors|length > 0 %}
+                        {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
+                        {% for sensor in occ_sensors %}
+                          {% set triggers = triggers + [{'platform': 'state', 'entity_id': sensor, 'to': ['on', 'open', 'detected']}] %}
+                        {% endfor %}
+                      {% endif %}
+                      {{ triggers }}
+                
+                # Wait for timer or sensor activation
                 - wait_for_trigger:
-                    - platform: state
-                      entity_id: !input binary_sensors
-                      to: 
-                        - "on"
-                        - "open"
-                        - "detected"
-                    - platform: state
-                      entity_id: !input occupancy_sensors
-                      to:
-                        - "on" 
-                        - "open"
-                        - "detected"
+                    "{{ trigger_list }}"
                   timeout: !input timer_duration
                   continue_on_timeout: true
                 
-                # Check if we timed out (no sensor activity) or if a sensor triggered
-                - choose:
-                    # If we timed out without any sensor activity, exit the loop
-                    - conditions:
+                # If timer expired without sensor activation, break the loop
+                - if:
+                    - condition: template
+                      value_template: "{{ wait.trigger is none }}"
+                  then:
+                    # Timer completed - exit the repeat loop
+                    - variables:
+                        timer_completed: true
+                  else:
+                    # Sensor was activated - wait for all sensors to clear again
+                    - if:
                         - condition: template
-                          value_template: "{{ wait.trigger is none }}"
-                      sequence:
-                        # Break out of the repeat loop
-                        - stop: "Timer completed without sensor activity"
-                    # If a sensor triggered, we continue the loop (timer resets)
-                    - conditions:
-                        - condition: template
-                          value_template: "{{ wait.trigger is not none }}"
-                      sequence:
-                        # Wait for all sensors to clear again before restarting timer
+                          value_template: "{{ wait_for_all_sensors }}"
+                      then:
                         - wait_template: >
-                            {% set motion_clear = true %}
-                            {% set occupancy_clear = true %}
-                            
-                            {% if wait_for_all_sensors %}
-                              {% set sensors = binary_sensors if binary_sensors is iterable and binary_sensors is not string else [binary_sensors] %}
-                              {% set motion_clear = sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
-                            {% endif %}
-                            
-                            {% if enable_occupancy_sensor %}
-                              {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
-                              {% set occupancy_clear = occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
-                            {% endif %}
-                            
-                            {{ motion_clear and occupancy_clear }}
+                            {% set sensors = binary_sensors if binary_sensors is iterable and binary_sensors is not string else [binary_sensors] %}
+                            {{ sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 }}
+                    
+                    - if:
+                        - condition: template
+                          value_template: "{{ enable_occupancy_sensor and occupancy_sensors|length > 0 }}"
+                      then:
+                        - wait_template: >
+                            {% set occ_sensors = occupancy_sensors if occupancy_sensors is iterable and occupancy_sensors is not string else [occupancy_sensors] %}
+                            {{ occ_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 }}
+              until:
+                - condition: template
+                  value_template: "{{ timer_completed is defined and timer_completed }}"
           
           # Turn off lights or activate off scene
           - choose:
@@ -474,14 +451,21 @@ action:
                       entity_id: !input off_scene
           
           # Turn off extra devices if enabled
-          - choose:
-              - conditions:
+          - if:
+              - condition: template
+                value_template: "{{ enable_extra_turnoff }}"
+            then:
+              - if:
                   - condition: template
-                    value_template: "{{ enable_extra_turnoff }}"
-                sequence:
+                    value_template: "{{ extra_devices|length > 0 }}"
+                then:
                   - service: homeassistant.turn_off
                     target:
                       entity_id: !input extra_devices
+              - if:
+                  - condition: template
+                    value_template: "{{ extra_off_scenes|length > 0 }}"
+                then:
                   - service: scene.turn_on
                     target:
                       entity_id: !input extra_off_scenes
