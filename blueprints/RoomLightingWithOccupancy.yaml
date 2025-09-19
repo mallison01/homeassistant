@@ -510,9 +510,9 @@ action:
                             value_template: "{{ enable_light_control and light_entities | length > 0 }}"
                         sequence:
                           - service: light.turn_on
+                            data: "{{ light_data }}"
                             target:
                               entity_id: "{{ light_entities }}"
-                            data: "{{ light_data }}"
                       # Turn on lights without advanced controls if disabled
                       - conditions:
                           - condition: template
@@ -628,10 +628,10 @@ action:
                                           value_template: "{{ enable_light_control and 'use_transition' in include_light_control and light_entities | length > 0 }}"
                                       sequence:
                                         - service: light.turn_off
-                                          target:
-                                            entity_id: "{{ light_entities }}"
                                           data:
                                             transition: "{{ light_transition_off }}"
+                                          target:
+                                            entity_id: "{{ light_entities }}"
                                     # Turn off lights without transition
                                     - conditions:
                                         - condition: template
