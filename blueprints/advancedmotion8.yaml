@@ -380,27 +380,26 @@ action:
           # Start the countdown timer with monitoring
           - repeat:
               sequence:
-                # Use different wait logic based on whether occupancy sensors are enabled
                 - choose:
-                  - conditions:
-                      - condition: template
-                        value_template: "{{ enable_occupancy_sensor and occupancy_sensors|length > 0 }}"
-                    sequence:
-                      - wait_for_trigger:
-                          - platform: state
-                            entity_id: !input binary_sensors
-                            to: 
-                              - "on"
-                              - "open"
-                              - "detected"
-                          - platform: state
-                            entity_id: !input occupancy_sensors
-                            to:
-                              - "on"
-                              - "open"
-                              - "detected"
-                        timeout: !input timer_duration
-                        continue_on_timeout: true
+                    - conditions:
+                        - condition: template
+                          value_template: "{{ enable_occupancy_sensor and occupancy_sensors|length > 0 }}"
+                      sequence:
+                        - wait_for_trigger:
+                            - platform: state
+                              entity_id: !input binary_sensors
+                              to: 
+                                - "on"
+                                - "open"
+                                - "detected"
+                            - platform: state
+                              entity_id: !input occupancy_sensors
+                              to:
+                                - "on"
+                                - "open"
+                                - "detected"
+                          timeout: !input timer_duration
+                          continue_on_timeout: true
                   default:
                     - wait_for_trigger:
                         - platform: state
