@@ -382,28 +382,10 @@ action:
               sequence:
                 # Use different wait logic based on whether occupancy sensors are enabled
                 - choose:
-                    # Both motion and occupancy sensors enabled
-                    - conditions:
-                        - condition: template
-                          value_template: "{{ enable_occupancy_sensor and occupancy_sensors|length > 0 }}"
-                      sequence:
-                        - wait_for_trigger:
-                            - platform: state
-                              entity_id: !input binary_sensors
-                              to: 
-                                - "on"
-                                - "open"
-                                - "detected"
-                            - platform: state
-                              entity_id: !input occupancy_sensors
-                              to:
-                                - "on"
-                                - "open"
-                                - "detected"
-                          timeout: !input timer_duration
-                          continue_on_timeout: true
-                    # Only motion sensors enabled
-                    default:
+                  - conditions:
+                      - condition: template
+                        value_template: "{{ enable_occupancy_sensor and occupancy_sensors|length > 0 }}"
+                    sequence:
                       - wait_for_trigger:
                           - platform: state
                             entity_id: !input binary_sensors
@@ -411,8 +393,24 @@ action:
                               - "on"
                               - "open"
                               - "detected"
+                          - platform: state
+                            entity_id: !input occupancy_sensors
+                            to:
+                              - "on"
+                              - "open"
+                              - "detected"
                         timeout: !input timer_duration
                         continue_on_timeout: true
+                  default:
+                    - wait_for_trigger:
+                        - platform: state
+                          entity_id: !input binary_sensors
+                          to: 
+                            - "on"
+                            - "open"
+                            - "detected"
+                      timeout: !input timer_duration
+                      continue_on_timeout: true
                 
                 # If timer expired without sensor activation, break the loop
                 - if:
