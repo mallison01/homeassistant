@@ -481,7 +481,8 @@ action:
                         sequence:
                           - service: light.turn_on
                             target:
-                              entity_id: "{{ switches | select('is_state_attr', 'domain', 'light') | list }}"
+                              entity_id: >
+                                {{ switches | select('match', '^light\\.') | list }}
                             data: >
                               {%- set data = {} -%}
                               
@@ -511,12 +512,14 @@ action:
                         sequence:
                           - service: homeassistant.turn_on
                             target:
-                              entity_id: "{{ switches | select('is_state_attr', 'domain', 'light') | list }}"
+                              entity_id: >
+                                {{ switches | select('match', '^light\\.') | list }}
                   
                   # Turn on non-light devices (switches, fans, etc.)
                   - service: homeassistant.turn_on
                     target:
-                      entity_id: "{{ switches | reject('is_state_attr', 'domain', 'light') | list }}"
+                      entity_id: >
+                        {{ switches | reject('match', '^light\\.') | list }}
           
           # Activate on scene if specified
           - choose:
@@ -645,7 +648,8 @@ action:
                         sequence:
                           - service: light.turn_off
                             target:
-                              entity_id: "{{ switches | select('match', '^light\\.') | list }}"
+                              entity_id: >
+                                {{ switches | select('match', '^light\\.') | list }}
                             data:
                               transition: "{{ light_transition_off }}"
                       # Turn off lights without transition or if no transition enabled
@@ -655,7 +659,8 @@ action:
                         sequence:
                           - service: homeassistant.turn_off
                             target:
-                              entity_id: "{{ switches | select('match', '^light\\.') | list }}"
+                              entity_id: >
+                                {{ switches | select('match', '^light\\.') | list }}
                   
                   # Turn off non-light devices (switches, fans, etc.)
                   - choose:
@@ -665,7 +670,8 @@ action:
                         sequence:
                           - service: homeassistant.turn_off
                             target:
-                              entity_id: "{{ switches | reject('match', '^light\\.') | list }}"
+                              entity_id: >
+                                {{ switches | reject('match', '^light\\.') | list }}
           
           # Activate off scene if specified
           - choose:
