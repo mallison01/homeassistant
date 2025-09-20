@@ -8,12 +8,13 @@ blueprint:
   domain: automation
   homeassistant:
     min_version: "2024.6.0"
+    
+    
   input:
-    input_sections:
-      zone_config:
+    zone_config:
         name: 🌿 Zone Configuration
         description: Configure irrigation zones, valves, and watering durations for up to 4 zones.
-        collapsed: false
+        collapsed: True
         input:
           zone1_valves:
             name: 🌿 Zone 1 Valves (Valve or Switch)
