@@ -13,7 +13,7 @@ blueprint:
     zone_config:
         name: 🌿 Zone Configuration
         description: Configure irrigation zones, valves, and watering durations for up to 4 zones.
-        collapsed: True
+        collapsed: False
         input:
           zone1_valves:
             name: 🌿 Zone 1 Valves (Valve or Switch)
