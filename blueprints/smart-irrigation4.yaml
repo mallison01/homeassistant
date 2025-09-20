@@ -9,7 +9,6 @@ blueprint:
   homeassistant:
     min_version: "2024.6.0"
     
-    
   input:
     zone_config:
         name: 🌿 Zone Configuration
@@ -124,7 +123,7 @@ blueprint:
                 min: 0
                 max: 120
 
-      schedule_timing:
+    schedule_timing:
         name: ⏰ Schedule & Timing
         description: Configure when automatic watering should occur and watering modes.
         collapsed: false
@@ -168,7 +167,7 @@ blueprint:
             selector:
               boolean: {}
 
-      weather_soil:
+    weather_soil:
         name: 🌧️ Weather & Soil Monitoring
         description: Configure sensors that monitor weather and soil conditions to prevent unnecessary watering.
         collapsed: true
@@ -222,7 +221,7 @@ blueprint:
               entity:
                 domain: binary_sensor
 
-      water_source_pump:
+    water_source_pump:
         name: 💧 Water Source & Pump Control
         description: Configure water source, pump control, and water level monitoring.
         collapsed: true
@@ -273,7 +272,7 @@ blueprint:
               entity:
                 domain: sensor
 
-      water_consumption:
+    water_consumption:
         name: 📊 Water Consumption Tracking
         description: Optional water usage calculation and reporting features.
         collapsed: true
