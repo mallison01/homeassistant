@@ -293,8 +293,11 @@ blueprint:
     device_zone:
       name: "Zone for Device Check"
       description: Zone where device should be present for automation to run (only used if Device Tracking is enabled)
+      default: []
       selector:
-        zone: {}
+        entity:
+          filter:
+            - domain: zone
     
     device_presence_required:
       name: "Device Must Be Present"
