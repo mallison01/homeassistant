@@ -1,17 +1,17 @@
 blueprint:
   name: Smart Garden Irrigation with Flexible Start Time
   description: >
-    🌱 Comprehensive smart garden irrigation system supporting multiple zones (lawn, raised bed, vegetables, shrubs)
+    🌱 Comprehensive smart garden irrigation system supporting up to 4 configurable zones
     with flexible scheduling, weather checks, and water source management. Features automatic rain/moisture detection,
     pump control, water consumption tracking, and notifications. Supports both parallel and sequential watering modes
     with manual override capabilities.
   domain: automation
   input:
 
-    # Zone Configuration - Lawn
-    lawn_zones:
-      name: 🌾 Lawn Zones (Valve or Switch)
-      description: Select one or more switch/valve entities that control lawn irrigation. These will be activated together when lawn watering is triggered.
+    # Zone Configuration - Zone 1
+    zone1_valves:
+      name: 🌿 Zone 1 Valves (Valve or Switch)
+      description: "Select one or more switch/valve entities that control Zone 1 irrigation. These will be activated together when Zone 1 watering is triggered."
       default: []
       selector:
         entity:
@@ -20,26 +20,26 @@ blueprint:
             - domain: switch
             - domain: valve
 
-    manual_lawn_select:
-      name: 🌾 Manual Lawn Control (Input Select)
-      description: Input select entity for manual lawn control. Should have options like "Stop" and "Start" to allow manual activation of lawn watering.
+    manual_zone1_select:
+      name: 🌿 Manual Zone 1 Control (Input Select)
+      description: "Input select entity for manual Zone 1 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 1 watering."
       selector:
         entity:
           domain: input_select
 
-    manual_lawn_duration:
-      name: 🌾 Manual Lawn Duration (Minutes, 0 = automatic)
-      description: Duration in minutes for lawn watering. Set to 0 to use automatic duration (10 minutes default), or specify custom duration.
+    manual_zone1_duration:
+      name: 🌿 Manual Zone 1 Duration (Minutes, 0 = automatic)
+      description: "Duration in minutes for Zone 1 watering. Set to 0 to use automatic duration (10 minutes default), or specify custom duration."
       default: 0
       selector:
         number:
           min: 0
           max: 120
 
-    # Zone Configuration - Raised Bed
-    raised_bed_zones:
-      name: 🪴 Raised Bed Zones (Valve or Switch)
-      description: Select one or more switch/valve entities that control raised bed irrigation. These will be activated together when raised bed watering is triggered.
+    # Zone Configuration - Zone 2
+    zone2_valves:
+      name: 🌿 Zone 2 Valves (Valve or Switch)
+      description: "Select one or more switch/valve entities that control Zone 2 irrigation. These will be activated together when Zone 2 watering is triggered."
       default: []
       selector:
         entity:
@@ -48,26 +48,26 @@ blueprint:
             - domain: switch
             - domain: valve
 
-    manual_raised_bed_select:
-      name: 🪴 Manual Raised Bed Control (Input Select)
-      description: Input select entity for manual raised bed control. Should have options like "Stop" and "Start" to allow manual activation of raised bed watering.
+    manual_zone2_select:
+      name: 🌿 Manual Zone 2 Control (Input Select)
+      description: "Input select entity for manual Zone 2 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 2 watering."
       selector:
         entity:
           domain: input_select
 
-    manual_raised_bed_duration:
-      name: 🪴 Manual Raised Bed Duration (Minutes, 0 = automatic)
-      description: Duration in minutes for raised bed watering. Set to 0 to use automatic duration (5 minutes default), or specify custom duration.
+    manual_zone2_duration:
+      name: 🌿 Manual Zone 2 Duration (Minutes, 0 = automatic)
+      description: "Duration in minutes for Zone 2 watering. Set to 0 to use automatic duration (5 minutes default), or specify custom duration."
       default: 0
       selector:
         number:
           min: 0
           max: 120
 
-    # Zone Configuration - Vegetables
-    vegetable_zones:
-      name: 🥕 Vegetable Zones (Valve or Switch)
-      description: Select one or more switch/valve entities that control vegetable garden irrigation. These will be activated together when vegetable watering is triggered.
+    # Zone Configuration - Zone 3
+    zone3_valves:
+      name: 🌿 Zone 3 Valves (Valve or Switch)
+      description: "Select one or more switch/valve entities that control Zone 3 irrigation. These will be activated together when Zone 3 watering is triggered."
       default: []
       selector:
         entity:
@@ -76,26 +76,26 @@ blueprint:
             - domain: switch
             - domain: valve
 
-    manual_vegetable_select:
-      name: 🥕 Manual Vegetable Control (Input Select)
-      description: Input select entity for manual vegetable garden control. Should have options like "Stop" and "Start" to allow manual activation of vegetable watering.
+    manual_zone3_select:
+      name: 🌿 Manual Zone 3 Control (Input Select)
+      description: "Input select entity for manual Zone 3 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 3 watering."
       selector:
         entity:
           domain: input_select
 
-    manual_vegetable_duration:
-      name: 🥕 Manual Vegetable Duration (Minutes, 0 = automatic)
-      description: Duration in minutes for vegetable garden watering. Set to 0 to use automatic duration (5 minutes default), or specify custom duration.
+    manual_zone3_duration:
+      name: 🌿 Manual Zone 3 Duration (Minutes, 0 = automatic)
+      description: "Duration in minutes for Zone 3 watering. Set to 0 to use automatic duration (5 minutes default), or specify custom duration."
       default: 0
       selector:
         number:
           min: 0
           max: 120
 
-    # Zone Configuration - Shrubs
-    shrub_zones:
-      name: 🌳 Shrub Zones (Valve or Switch)
-      description: Select one or more switch/valve entities that control shrub irrigation. These will be activated together when shrub watering is triggered.
+    # Zone Configuration - Zone 4
+    zone4_valves:
+      name: 🌿 Zone 4 Valves (Valve or Switch)
+      description: "Select one or more switch/valve entities that control Zone 4 irrigation. These will be activated together when Zone 4 watering is triggered."
       default: []
       selector:
         entity:
@@ -104,16 +104,16 @@ blueprint:
             - domain: switch
             - domain: valve
 
-    manual_shrub_select:
-      name: 🌳 Manual Shrub Control (Input Select)
-      description: Input select entity for manual shrub control. Should have options like "Stop" and "Start" to allow manual activation of shrub watering.
+    manual_zone4_select:
+      name: 🌿 Manual Zone 4 Control (Input Select)
+      description: "Input select entity for manual Zone 4 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 4 watering."
       selector:
         entity:
           domain: input_select
 
-    manual_shrub_duration:
-      name: 🌳 Manual Shrub Duration (Minutes, 0 = automatic)
-      description: Duration in minutes for shrub watering. Set to 0 to use automatic duration (7 minutes default), or specify custom duration.
+    manual_zone4_duration:
+      name: 🌿 Manual Zone 4 Duration (Minutes, 0 = automatic)
+      description: "Duration in minutes for Zone 4 watering. Set to 0 to use automatic duration (7 minutes default), or specify custom duration."
       default: 0
       selector:
         number:
@@ -135,7 +135,7 @@ blueprint:
 
     min_water_level:
       name: 🪣 Minimum Water Level for Pump Activation
-      description: Minimum water level required to activate the pump (only relevant for rainwater/cistern). Units should match your water level sensor (liters, gallons, percentage, etc.).
+      description: "Minimum water level required to activate the pump (only relevant for rainwater/cistern). Units should match your water level sensor (gallons, percentage, etc.)."
       default: 100
       selector:
         number:
@@ -163,7 +163,7 @@ blueprint:
     # Water Level Monitoring
     water_level_sensor:
       name: 🪣 Water Level Sensor (Optional)
-      description: Sensor that reports water tank level. Only required when using rainwater/cistern as water source. Should report level in units matching your minimum water level setting.
+      description: "Sensor that reports water tank level. Only required when using rainwater/cistern as water source. Should report level in units matching your minimum water level setting."
       default: null
       selector:
         entity:
@@ -222,8 +222,8 @@ blueprint:
 
     # Water Consumption Tracking
     water_consumption_per_minute:
-      name: 📊 Water Consumption per Minute (Liters)
-      description: "Optional: Average water consumption rate in liters per minute for all zones combined. Used to calculate and report total water usage after each watering cycle."
+      name: 📊 Water Consumption per Minute (Gallons)
+      description: "Optional: Average water consumption rate in gallons per minute for all zones combined. Used to calculate and report total water usage after each watering cycle."
       default: 0
       selector:
         number:
@@ -304,14 +304,14 @@ variables:
   rain_sensor: !input rain_amount_sensor
   rain_live_sensor: !input rain_live_sensor
   rain_threshold: !input rain_threshold
-  zones_lawn: !input lawn_zones
-  zones_raised: !input raised_bed_zones
-  zones_veg: !input vegetable_zones
-  zones_shrub: !input shrub_zones
-  manual_lawn: !input manual_lawn_select
-  manual_raised: !input manual_raised_bed_select
-  manual_veg: !input manual_vegetable_select
-  manual_shrub: !input manual_shrub_select
+  zones_zone1: !input zone1_valves
+  zones_zone2: !input zone2_valves
+  zones_zone3: !input zone3_valves
+  zones_zone4: !input zone4_valves
+  manual_zone1: !input manual_zone1_select
+  manual_zone2: !input manual_zone2_select
+  manual_zone3: !input manual_zone3_select
+  manual_zone4: !input manual_zone4_select
   pump: !input pump
   pump_delay: !input pump_delay
   fill_sensor: !input water_level_sensor
@@ -319,10 +319,10 @@ variables:
   water_rate: !input water_consumption_per_minute
   parallel: !input parallel_watering
   start_time_option: !input start_time_option
-  manual_lawn_duration: !input manual_lawn_duration
-  manual_raised_bed_duration: !input manual_raised_bed_duration
-  manual_vegetable_duration: !input manual_vegetable_duration
-  manual_shrub_duration: !input manual_shrub_duration
+  manual_zone1_duration: !input manual_zone1_duration
+  manual_zone2_duration: !input manual_zone2_duration
+  manual_zone3_duration: !input manual_zone3_duration
+  manual_zone4_duration: !input manual_zone4_duration
 
 condition:
   - condition: or
@@ -331,10 +331,10 @@ condition:
         value_template: "{{ trigger.id == start_time_option }}"
       - condition: template
         value_template: >
-          {{ manual_lawn is defined and states(manual_lawn) != 'off' or
-             manual_raised is defined and states(manual_raised) != 'off' or
-             manual_veg is defined and states(manual_veg) != 'off' or
-             manual_shrub is defined and states(manual_shrub) != 'off' }}
+          {{ manual_zone1 is defined and states(manual_zone1) != 'off' or
+             manual_zone2 is defined and states(manual_zone2) != 'off' or
+             manual_zone3 is defined and states(manual_zone3) != 'off' or
+             manual_zone4 is defined and states(manual_zone4) != 'off' }}
 
 action:
   - choose:
@@ -399,44 +399,44 @@ action:
                 sequence:
                   - service: homeassistant.turn_on
                     target:
-                      entity_id: "{{ zones_lawn + zones_raised + zones_veg + zones_shrub }}"
+                      entity_id: "{{ zones_zone1 + zones_zone2 + zones_zone3 + zones_zone4 }}"
               - conditions: []
                 sequence:
                   - service: homeassistant.turn_on
                     target:
-                      entity_id: "{{ zones_lawn }}"
+                      entity_id: "{{ zones_zone1 }}"
                   - delay:
-                      minutes: "{{ manual_lawn_duration if manual_lawn_duration > 0 else 10 }}"
+                      minutes: "{{ manual_zone1_duration if manual_zone1_duration > 0 else 10 }}"
                   - service: homeassistant.turn_off
                     target:
-                      entity_id: "{{ zones_lawn }}"
+                      entity_id: "{{ zones_zone1 }}"
 
                   - service: homeassistant.turn_on
                     target:
-                      entity_id: "{{ zones_raised }}"
+                      entity_id: "{{ zones_zone2 }}"
                   - delay:
-                      minutes: "{{ manual_raised_bed_duration if manual_raised_bed_duration > 0 else 5 }}"
+                      minutes: "{{ manual_zone2_duration if manual_zone2_duration > 0 else 5 }}"
                   - service: homeassistant.turn_off
                     target:
-                      entity_id: "{{ zones_raised }}"
+                      entity_id: "{{ zones_zone2 }}"
 
                   - service: homeassistant.turn_on
                     target:
-                      entity_id: "{{ zones_veg }}"
+                      entity_id: "{{ zones_zone3 }}"
                   - delay:
-                      minutes: "{{ manual_vegetable_duration if manual_vegetable_duration > 0 else 5 }}"
+                      minutes: "{{ manual_zone3_duration if manual_zone3_duration > 0 else 5 }}"
                   - service: homeassistant.turn_off
                     target:
-                      entity_id: "{{ zones_veg }}"
+                      entity_id: "{{ zones_zone3 }}"
 
                   - service: homeassistant.turn_on
                     target:
-                      entity_id: "{{ zones_shrub }}"
+                      entity_id: "{{ zones_zone4 }}"
                   - delay:
-                      minutes: "{{ manual_shrub_duration if manual_shrub_duration > 0 else 7 }}"
+                      minutes: "{{ manual_zone4_duration if manual_zone4_duration > 0 else 7 }}"
                   - service: homeassistant.turn_off
                     target:
-                      entity_id: "{{ zones_shrub }}"
+                      entity_id: "{{ zones_zone4 }}"
 
           - if:
               - condition: template
@@ -455,11 +455,11 @@ action:
                   title: Water usage
                   message: >
                     Water used: {{
-                      ( (manual_lawn_duration if manual_lawn_duration > 0 else 10) +
-                        (manual_raised_bed_duration if manual_raised_bed_duration > 0 else 5) +
-                        (manual_vegetable_duration if manual_vegetable_duration > 0 else 5) +
-                        (manual_shrub_duration if manual_shrub_duration > 0 else 7) 
+                      ( (manual_zone1_duration if manual_zone1_duration > 0 else 10) +
+                        (manual_zone2_duration if manual_zone2_duration > 0 else 5) +
+                        (manual_zone3_duration if manual_zone3_duration > 0 else 5) +
+                        (manual_zone4_duration if manual_zone4_duration > 0 else 7) 
                       ) * water_rate
-                    }} liters.
+                    }} gallons.
 
 mode: single
