@@ -1,8 +1,8 @@
 blueprint:
-  name: Smart Garden Irrigation with Flexible Start Time
+  name: Smart Multi-Zone Irrigation with Weather & Soil Monitoring
   description: >
-    🌱 Comprehensive smart garden irrigation system supporting up to 4 configurable zones
-    with flexible scheduling, weather checks, and water source management. Features automatic rain/moisture detection,
+    🌱 Comprehensive smart irrigation system supporting up to 4 configurable zones
+    with weather monitoring, soil moisture detection, and water source management. Features automatic rain/moisture detection,
     pump control, water consumption tracking, and notifications. Supports both parallel and sequential watering modes
     with manual override capabilities.
   domain: automation
@@ -281,48 +281,48 @@ blueprint:
 
 trigger:
   - platform: time
-    at: !input fixed_start_time
+    at: !input section_scheduling.fixed_start_time
     id: fixed_time
   - platform: sun
     event: sunset
-    offset: !input start_time_offset
+    offset: !input section_scheduling.start_time_offset
     id: sunset
   - platform: sun
     event: sunrise
-    offset: !input start_time_offset
+    offset: !input section_scheduling.start_time_offset
     id: sunrise
   - platform: time
     at: "02:00:00"
     id: night
 
 variables:
-  water_source: !input water_source
-  min_level: !input min_water_level
-  use_soil: !input use_soil_moisture
-  soil_sensor: !input soil_moisture_sensor
-  soil_threshold: !input soil_moisture_threshold
-  rain_sensor: !input rain_amount_sensor
-  rain_live_sensor: !input rain_live_sensor
-  rain_threshold: !input rain_threshold
-  zones_zone1: !input zone1_valves
-  zones_zone2: !input zone2_valves
-  zones_zone3: !input zone3_valves
-  zones_zone4: !input zone4_valves
-  manual_zone1: !input manual_zone1_select
-  manual_zone2: !input manual_zone2_select
-  manual_zone3: !input manual_zone3_select
-  manual_zone4: !input manual_zone4_select
-  pump: !input pump
-  pump_delay: !input pump_delay
-  fill_sensor: !input water_level_sensor
-  water_calc: !input enable_water_consumption
-  water_rate: !input water_consumption_per_minute
-  parallel: !input parallel_watering
-  start_time_option: !input start_time_option
-  manual_zone1_duration: !input manual_zone1_duration
-  manual_zone2_duration: !input manual_zone2_duration
-  manual_zone3_duration: !input manual_zone3_duration
-  manual_zone4_duration: !input manual_zone4_duration
+  water_source: !input section_water_pump.water_source
+  min_level: !input section_water_pump.min_water_level
+  use_soil: !input section_sensors.use_soil_moisture
+  soil_sensor: !input section_sensors.soil_moisture_sensor
+  soil_threshold: !input section_sensors.soil_moisture_threshold
+  rain_sensor: !input section_sensors.rain_amount_sensor
+  rain_live_sensor: !input section_sensors.rain_live_sensor
+  rain_threshold: !input section_sensors.rain_threshold
+  zones_zone1: !input section_zones.zone1_valves
+  zones_zone2: !input section_zones.zone2_valves
+  zones_zone3: !input section_zones.zone3_valves
+  zones_zone4: !input section_zones.zone4_valves
+  manual_zone1: !input section_zones.manual_zone1_select
+  manual_zone2: !input section_zones.manual_zone2_select
+  manual_zone3: !input section_zones.manual_zone3_select
+  manual_zone4: !input section_zones.manual_zone4_select
+  pump: !input section_water_pump.pump
+  pump_delay: !input section_water_pump.pump_delay
+  fill_sensor: !input section_water_pump.water_level_sensor
+  water_calc: !input section_tracking.enable_water_consumption
+  water_rate: !input section_tracking.water_consumption_per_minute
+  parallel: !input section_scheduling.parallel_watering
+  start_time_option: !input section_scheduling.start_time_option
+  manual_zone1_duration: !input section_zones.manual_zone1_duration
+  manual_zone2_duration: !input section_zones.manual_zone2_duration
+  manual_zone3_duration: !input section_zones.manual_zone3_duration
+  manual_zone4_duration: !input section_zones.manual_zone4_duration
 
 condition:
   - condition: or
@@ -388,9 +388,9 @@ action:
             then:
               - service: switch.turn_on
                 target:
-                  entity_id: !input pump
+                  entity_id: !input section_water_pump.pump
               - delay:
-                  seconds: !input pump_delay
+                  seconds: !input section_water_pump.pump_delay
 
           - choose:
               - conditions:
@@ -444,7 +444,7 @@ action:
             then:
               - service: switch.turn_off
                 target:
-                  entity_id: !input pump
+                  entity_id: !input section_water_pump.pump
 
           - if:
               - condition: template
