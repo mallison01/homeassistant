@@ -7,20 +7,13 @@ blueprint:
   input:
     # === TRIGGER SENSORS ===
     binary_sensors:
-      name: Motion Sensors or Door Sensors
-      description: Select one or more motion sensors or door sensors that will trigger the automation
+      name: Binary Sensors
+      description: Select one or more binary sensors that will trigger the automation (motion sensors, door sensors, window sensors, PIR sensors, etc.)
       selector:
         entity:
           multiple: true
           filter:
             - domain: binary_sensor
-    
-    wait_for_all_sensors:
-      name: Wait for All Sensors Clear
-      description: Wait until ALL motion/door sensors are clear before starting timer
-      default: true
-      selector:
-        boolean:
     
     # === OCCUPANCY DETECTION ===
     enable_occupancy_sensor:
@@ -39,6 +32,21 @@ blueprint:
           multiple: true
           filter:
             - domain: binary_sensor
+    
+    wait_for_all_sensors:
+      name: Wait for All Sensors to Clear
+      description: Wait until ALL binary sensors (triggers and occupancy sensors if enabled) are clear before starting timer. If disabled and occupancy detection is also disabled, timer starts immediately after initial trigger clears.
+      default: true
+      selector:
+        boolean:
+    
+    wait_for_clear_duration:
+      name: Sensor Clear Wait Duration
+      description: How long all sensors must remain clear before starting the turn-off timer (only used if Wait for All Sensors to Clear is enabled)
+      default:
+        seconds: 30
+      selector:
+        duration:
     
     # === LIGHTS AND SWITCHES ===
     switches:
@@ -76,6 +84,36 @@ blueprint:
       default: ""
       selector:
         entity:
+          filter:
+            - domain: scene
+    
+    # === EXTRA TURN OFF OPTIONS ===
+    enable_extra_turnoff:
+      name: "Enable Extra Turn Off"
+      description: Turn off additional devices/scenes when timer expires
+      default: false
+      selector:
+        boolean:
+    
+    extra_devices:
+      name: "Extra Devices to Turn Off"
+      description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
+      default: []
+      selector:
+        entity:
+          multiple: true
+          filter:
+            - domain: light
+            - domain: switch
+            - domain: fan
+    
+    extra_off_scenes:
+      name: "Extra Scenes to Activate"
+      description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
+      default: []
+      selector:
+        entity:
+          multiple: true
           filter:
             - domain: scene
     
@@ -212,38 +250,6 @@ blueprint:
         object:
     
     # === OPTIONAL CONDITIONS ===
-    # Device Tracking
-    enable_device_tracking:
-      name: "Enable Device Tracking"
-      description: Enable device presence checking
-      default: false
-      selector:
-        boolean:
-    
-    tracked_device:
-      name: "Device to Track"
-      description: Device that must be present/absent for automation to run (only used if Device Tracking is enabled)
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: device_tracker
-            - domain: person
-    
-    device_zone:
-      name: "Zone for Device Check"
-      description: Zone where device should be present for automation to run (only used if Device Tracking is enabled)
-      default: "home"
-      selector:
-        text:
-    
-    device_presence_required:
-      name: "Device Must Be Present"
-      description: If enabled, device must be in zone. If disabled, device must NOT be in zone (only used if Device Tracking is enabled)
-      default: true
-      selector:
-        boolean:
-    
     # Time Restrictions
     enable_time_restriction:
       name: "Enable Time Restrictions"
@@ -265,6 +271,37 @@ blueprint:
       default: "23:59:59"
       selector:
         time:
+    
+    # Device Tracking
+    enable_device_tracking:
+      name: "Enable Device Tracking"
+      description: Enable device presence checking
+      default: false
+      selector:
+        boolean:
+    
+    tracked_device:
+      name: "Device to Track"
+      description: Device that must be present/absent for automation to run (only used if Device Tracking is enabled)
+      default: ""
+      selector:
+        entity:
+          filter:
+            - domain: device_tracker
+            - domain: person
+    
+    device_zone:
+      name: "Zone for Device Check"
+      description: Zone where device should be present for automation to run (only used if Device Tracking is enabled)
+      selector:
+        zone: {}
+    
+    device_presence_required:
+      name: "Device Must Be Present"
+      description: If enabled, device must be in zone. If disabled, device must NOT be in zone (only used if Device Tracking is enabled)
+      default: true
+      selector:
+        boolean:
     
     # Day Restrictions
     enable_day_restriction:
@@ -394,6 +431,7 @@ variables:
   enable_occupancy_sensor: !input enable_occupancy_sensor
   occupancy_sensors: !input occupancy_sensors
   wait_for_all_sensors: !input wait_for_all_sensors
+  wait_for_clear_duration: !input wait_for_clear_duration
   enable_extra_turnoff: !input enable_extra_turnoff
   extra_devices: !input extra_devices
   extra_off_scenes: !input extra_off_scenes
@@ -556,7 +594,7 @@ action:
                     while:
                       - condition: or
                         conditions:
-                          # Check if we need to wait for all motion sensors to be clear
+                          # Check if we need to wait for all binary sensors to be clear
                           - condition: and
                             conditions:
                               - condition: template
@@ -568,7 +606,7 @@ action:
                           - condition: and
                             conditions:
                               - condition: template
-                                value_template: "{{ enable_occupancy_sensor }}"
+                                value_template: "{{ enable_occupancy_sensor and wait_for_all_sensors }}"
                               - condition: template
                                 value_template: >
                                   {{ occupancy_sensors | select('is_state', ['on', 'open', 'detected']) | list | length > 0 }}
@@ -582,13 +620,20 @@ action:
                             {% set motion_clear = binary_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
                           {% endif %}
                           
-                          {% if enable_occupancy_sensor %}
+                          {% if enable_occupancy_sensor and wait_for_all_sensors %}
                             {% set occupancy_clear = occupancy_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
                           {% endif %}
                           
                           {{ motion_clear and occupancy_clear }}
                 
-                # Wait for the timer duration, but with sensor monitoring
+                # Wait for all sensors to remain clear for the specified duration
+                - choose:
+                    - conditions:
+                        - condition: template
+                          value_template: "{{ wait_for_all_sensors }}"
+                      sequence:
+                        - delay: !input wait_for_clear_duration
+                
                 - wait_for_trigger:
                     - platform: state
                       entity_id: !input binary_sensors
@@ -699,7 +744,7 @@ action:
                               {% set motion_clear = binary_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
                             {% endif %}
                             
-                            {% if enable_occupancy_sensor %}
+                            {% if enable_occupancy_sensor and wait_for_all_sensors %}
                               {% set occupancy_clear = occupancy_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
                             {% endif %}
                             
