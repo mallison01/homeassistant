@@ -1,0 +1,527 @@
+blueprint:
+  name: Smart Multi-Zone Irrigation with Weather & Soil Monitoring
+  description: >
+    🌱 Comprehensive smart irrigation system supporting up to 4 configurable zones
+    with weather monitoring, soil moisture detection, and water source management. Features automatic rain/moisture detection,
+    pump control, water consumption tracking, and notifications. Supports both parallel and sequential watering modes
+    with manual override capabilities. Zones 2-4 are optional and can be disabled.
+  domain: automation
+  homeassistant:
+    min_version: "2024.6.0"
+    
+  input:
+    zone_config:
+        name: 🌿 Zone Configuration
+        description: Configure irrigation zones, valves, and watering durations for up to 4 zones.
+        collapsed: False
+        input:
+          zone1_valves:
+            name: 🌿 Zone 1 Valves (Valve or Switch)
+            description: "Select one or more switch/valve entities that control Zone 1 irrigation. These will be activated together when Zone 1 watering is triggered."
+            default: []
+            selector:
+              entity:
+                multiple: true
+                filter:
+                  - domain: switch
+                  - domain: valve
+
+          manual_zone1_select:
+            name: 🌿 Manual Zone 1 Control (Input Select)
+            description: "Input select entity for manual Zone 1 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 1 watering."
+            selector:
+              entity:
+                domain: input_select
+
+          manual_zone1_duration:
+            name: 🌿 Manual Zone 1 Duration (Minutes, 0 = automatic)
+            description: "Duration in minutes for Zone 1 watering. Set to 0 to use automatic duration (10 minutes default), or specify custom duration."
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 120
+
+          enable_zone2:
+            name: 🌿 Enable Zone 2
+            description: "Enable Zone 2 irrigation. If disabled, Zone 2 will be completely ignored in all operations."
+            default: false
+            selector:
+              boolean: {}
+
+          zone2_valves:
+            name: 🌿 Zone 2 Valves (Valve or Switch)
+            description: "Select one or more switch/valve entities that control Zone 2 irrigation. These will be activated together when Zone 2 watering is triggered."
+            default: []
+            selector:
+              entity:
+                multiple: true
+                filter:
+                  - domain: switch
+                  - domain: valve
+
+          manual_zone2_select:
+            name: 🌿 Manual Zone 2 Control (Input Select)
+            description: "Input select entity for manual Zone 2 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 2 watering."
+            default: ""
+            selector:
+              entity:
+                domain: input_select
+
+          manual_zone2_duration:
+            name: 🌿 Manual Zone 2 Duration (Minutes, 0 = automatic)
+            description: "Duration in minutes for Zone 2 watering. Set to 0 to use automatic duration (5 minutes default), or specify custom duration."
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 120
+
+          enable_zone3:
+            name: 🌿 Enable Zone 3
+            description: "Enable Zone 3 irrigation. If disabled, Zone 3 will be completely ignored in all operations."
+            default: false
+            selector:
+              boolean: {}
+
+          zone3_valves:
+            name: 🌿 Zone 3 Valves (Valve or Switch)
+            description: "Select one or more switch/valve entities that control Zone 3 irrigation. These will be activated together when Zone 3 watering is triggered."
+            default: []
+            selector:
+              entity:
+                multiple: true
+                filter:
+                  - domain: switch
+                  - domain: valve
+
+          manual_zone3_select:
+            name: 🌿 Manual Zone 3 Control (Input Select)
+            description: "Input select entity for manual Zone 3 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 3 watering."
+            default: ""
+            selector:
+              entity:
+                domain: input_select
+
+          manual_zone3_duration:
+            name: 🌿 Manual Zone 3 Duration (Minutes, 0 = automatic)
+            description: "Duration in minutes for Zone 3 watering. Set to 0 to use automatic duration (5 minutes default), or specify custom duration."
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 120
+
+          enable_zone4:
+            name: 🌿 Enable Zone 4
+            description: "Enable Zone 4 irrigation. If disabled, Zone 4 will be completely ignored in all operations."
+            default: false
+            selector:
+              boolean: {}
+
+          zone4_valves:
+            name: 🌿 Zone 4 Valves (Valve or Switch)
+            description: "Select one or more switch/valve entities that control Zone 4 irrigation. These will be activated together when Zone 4 watering is triggered."
+            default: []
+            selector:
+              entity:
+                multiple: true
+                filter:
+                  - domain: switch
+                  - domain: valve
+
+          manual_zone4_select:
+            name: 🌿 Manual Zone 4 Control (Input Select)
+            description: "Input select entity for manual Zone 4 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 4 watering."
+            default: ""
+            selector:
+              entity:
+                domain: input_select
+
+          manual_zone4_duration:
+            name: 🌿 Manual Zone 4 Duration (Minutes, 0 = automatic)
+            description: "Duration in minutes for Zone 4 watering. Set to 0 to use automatic duration (7 minutes default), or specify custom duration."
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 120
+
+    schedule_timing:
+        name: ⏰ Schedule & Timing
+        description: Configure when automatic watering should occur and watering modes.
+        collapsed: true
+        input:
+          start_time_option:
+            name: ⏰ Choose Start Time Option
+            description: "Select how automatic watering should be scheduled. Choose fixed time for specific schedule, night for 2 AM watering, or sunrise/sunset with custom offset."
+            default: fixed_time
+            selector:
+              select:
+                options:
+                  - label: Fixed Time (manual input)
+                    value: fixed_time
+                  - label: Night (02:00 AM)
+                    value: night
+                  - label: Sunset with Offset
+                    value: sunset
+                  - label: Sunrise with Offset
+                    value: sunrise
+
+          fixed_start_time:
+            name: ⏰ Fixed Start Time
+            description: "Specific time to start automatic watering (only used when 'Fixed Time' is selected above). Format: HH:MM (24-hour format)."
+            default: "06:00:00"
+            selector:
+              time: {}
+
+          start_time_offset:
+            name: ⏰ Offset for Sunrise/Sunset (Minutes)
+            description: "Time offset in minutes for sunrise/sunset scheduling. Positive values = later (after sunrise/sunset), negative values = earlier (before sunrise/sunset)."
+            default: 0
+            selector:
+              number:
+                min: -120
+                max: 120
+
+          parallel_watering:
+            name: 🤖 Irrigation Mode - Parallel or Sequential?
+            description: "Choose watering mode. True = Parallel (all enabled zones water simultaneously), False = Sequential (enabled zones water one after another with individual durations)."
+            default: false
+            selector:
+              boolean: {}
+
+    weather_soil:
+        name: 🌧️ Weather & Soil Monitoring
+        description: Configure sensors that monitor weather and soil conditions to prevent unnecessary watering.
+        collapsed: true
+        input:
+          soil_moisture_sensor:
+            name: 💧 Soil Moisture Sensor (Optional)
+            description: "Sensor that reports soil moisture as a percentage (0-100%). Watering will be skipped if moisture level is above the threshold. Helps conserve water and prevent overwatering."
+            default: null
+            selector:
+              entity:
+                domain: sensor
+
+          use_soil_moisture:
+            name: 💧 Use Soil Moisture Check?
+            description: "Enable automatic soil moisture checking before watering. If enabled, watering will be skipped when soil moisture is above the threshold."
+            default: false
+            selector:
+              boolean: {}
+
+          soil_moisture_threshold:
+            name: 💧 Soil Moisture Threshold (%)
+            description: "Skip watering if soil moisture percentage is above this value. Typical values are 30-50% depending on plant needs and sensor calibration."
+            default: 30
+            selector:
+              number:
+                min: 0
+                max: 100
+
+          rain_threshold:
+            name: 🌧️ Rain Amount Threshold (inches)
+            description: "Skip watering if recent rainfall amount exceeds this threshold in inches. Helps prevent unnecessary watering after rain."
+            default: 0.4
+            selector:
+              number:
+                min: 0
+                max: 4
+
+          rain_amount_sensor:
+            name: 🌧️ Rain Amount Sensor (Optional)
+            description: "Sensor that reports recent rainfall amount in inches. Used to skip watering when sufficient rain has occurred. Can be from weather integration or physical rain gauge."
+            default: null
+            selector:
+              entity:
+                domain: sensor
+
+          rain_live_sensor:
+            name: 🌧️ Rain Detection Sensor (Optional)
+            description: "Binary sensor that detects active rain (on = rain detected, off = no rain). Watering will be immediately stopped if rain is detected during operation."
+            default: null
+            selector:
+              entity:
+                domain: binary_sensor
+
+    water_source_pump:
+        name: 💧 Water Source & Pump Control
+        description: Configure water source, pump control, and water level monitoring.
+        collapsed: true
+        input:
+          water_source:
+            name: 💧 Select Water Source
+            description: "Choose your water source. Select 'Tap Water' for unlimited mains water supply, or 'Rainwater/Cistern' for tank-based systems with level monitoring."
+            default: "tap_water"
+            selector:
+              select:
+                options:
+                  - label: Tap Water (Unlimited Supply)
+                    value: tap_water
+                  - label: Rainwater / Cistern (Tank-based)
+                    value: rainwater
+
+          min_water_level:
+            name: 🪣 Minimum Water Level for Pump Activation
+            description: "Minimum water level required to activate the pump (only relevant for rainwater/cistern). Units should match your water level sensor (gallons, percentage, etc.)."
+            default: 100
+            selector:
+              number:
+                min: 0
+                max: 50000
+
+          pump:
+            name: ⚡ Pump (Optional)
+            description: "Switch entity that controls your irrigation pump. Leave empty if you don't have a pump or it's always on. The pump will be activated before watering starts and turned off when complete."
+            default: null
+            selector:
+              entity:
+                domain: switch
+
+          pump_delay:
+            name: ⚡ Pump Delay (Seconds)
+            description: "Delay in seconds after starting the pump before opening valves. This allows the pump to build up pressure for optimal irrigation performance."
+            default: 5
+            selector:
+              number:
+                min: 1
+                max: 60
+
+          water_level_sensor:
+            name: 🪣 Water Level Sensor (Optional)
+            description: "Sensor that reports water tank level. Only required when using rainwater/cistern as water source. Should report level in units matching your minimum water level setting."
+            default: null
+            selector:
+              entity:
+                domain: sensor
+
+    water_consumption:
+        name: 📊 Water Consumption Tracking
+        description: Optional water usage calculation and reporting features.
+        collapsed: true
+        input:
+          water_consumption_per_minute:
+            name: 📊 Water Consumption per Minute (Gallons)
+            description: "Optional: Average water consumption rate in gallons per minute for all zones combined. Used to calculate and report total water usage after each watering cycle."
+            default: 0
+            selector:
+              number:
+                min: 0
+                max: 100
+                step: 0.1
+
+          enable_water_consumption:
+            name: 📊 Enable Water Consumption Calculation?
+            description: "Enable automatic calculation and notification of water usage after each watering cycle. Requires water consumption rate to be set above."
+            default: false
+            selector:
+              boolean: {}
+
+trigger:
+  - platform: time
+    at: !input fixed_start_time
+    id: fixed_time
+  - platform: sun
+    event: sunset
+    offset: !input start_time_offset
+    id: sunset
+  - platform: sun
+    event: sunrise
+    offset: !input start_time_offset
+    id: sunrise
+  - platform: time
+    at: "02:00:00"
+    id: night
+
+variables:
+  water_source: !input water_source
+  min_level: !input min_water_level
+  use_soil: !input use_soil_moisture
+  soil_sensor: !input soil_moisture_sensor
+  soil_threshold: !input soil_moisture_threshold
+  rain_sensor: !input rain_amount_sensor
+  rain_live_sensor: !input rain_live_sensor
+  rain_threshold: !input rain_threshold
+  zones_zone1: !input zone1_valves
+  zones_zone2: !input zone2_valves
+  zones_zone3: !input zone3_valves
+  zones_zone4: !input zone4_valves
+  enable_zone2: !input enable_zone2
+  enable_zone3: !input enable_zone3
+  enable_zone4: !input enable_zone4
+  manual_zone1: !input manual_zone1_select
+  manual_zone2: !input manual_zone2_select
+  manual_zone3: !input manual_zone3_select
+  manual_zone4: !input manual_zone4_select
+  pump: !input pump
+  pump_delay: !input pump_delay
+  fill_sensor: !input water_level_sensor
+  water_calc: !input enable_water_consumption
+  water_rate: !input water_consumption_per_minute
+  parallel: !input parallel_watering
+  start_time_option: !input start_time_option
+  manual_zone1_duration: !input manual_zone1_duration
+  manual_zone2_duration: !input manual_zone2_duration
+  manual_zone3_duration: !input manual_zone3_duration
+  manual_zone4_duration: !input manual_zone4_duration
+
+condition:
+  - condition: or
+    conditions:
+      - condition: template
+        value_template: "{{ trigger.id == start_time_option }}"
+      - condition: template
+        value_template: >
+          {{ manual_zone1 is defined and states(manual_zone1) != 'off' or
+             (enable_zone2 and manual_zone2 is defined and states(manual_zone2) != 'off') or
+             (enable_zone3 and manual_zone3 is defined and states(manual_zone3) != 'off') or
+             (enable_zone4 and manual_zone4 is defined and states(manual_zone4) != 'off') }}
+
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ water_source == 'rainwater' and fill_sensor is defined and
+                 (states(fill_sensor) | float(0)) < min_level }}
+        sequence:
+          - service: persistent_notification.create
+            data:
+              title: Irrigation blocked
+              message: Fill level too low for pump!
+
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ use_soil and soil_sensor is defined and
+                 (states(soil_sensor) | float(0)) > soil_threshold }}
+        sequence:
+          - service: persistent_notification.create
+            data:
+              title: Irrigation not necessary
+              message: Soil moisture above threshold.
+
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ rain_sensor is defined and (states(rain_sensor) | float(0)) > rain_threshold }}
+        sequence:
+          - service: persistent_notification.create
+            data:
+              title: Irrigation skipped
+              message: Rain amount above threshold.
+
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ rain_live_sensor is defined and is_state(rain_live_sensor, 'on') }}
+        sequence:
+          - service: persistent_notification.create
+            data:
+              title: Irrigation stopped
+              message: Rain detected by live sensor.
+
+      - conditions: []
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ pump is defined }}"
+            then:
+              - service: switch.turn_on
+                target:
+                  entity_id: !input pump
+              - delay:
+                  seconds: !input pump_delay
+
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ parallel }}"
+                sequence:
+                  - service: homeassistant.turn_on
+                    target:
+                      entity_id: >
+                        {{ zones_zone1 + 
+                           (zones_zone2 if enable_zone2 else []) + 
+                           (zones_zone3 if enable_zone3 else []) + 
+                           (zones_zone4 if enable_zone4 else []) }}
+              - conditions: []
+                sequence:
+                  # Zone 1 (always enabled)
+                  - service: homeassistant.turn_on
+                    target:
+                      entity_id: "{{ zones_zone1 }}"
+                  - delay:
+                      minutes: "{{ manual_zone1_duration if manual_zone1_duration > 0 else 10 }}"
+                  - service: homeassistant.turn_off
+                    target:
+                      entity_id: "{{ zones_zone1 }}"
+
+                  # Zone 2 (only if enabled)
+                  - if:
+                      - condition: template
+                        value_template: "{{ enable_zone2 and zones_zone2 | length > 0 }}"
+                    then:
+                      - service: homeassistant.turn_on
+                        target:
+                          entity_id: "{{ zones_zone2 }}"
+                      - delay:
+                          minutes: "{{ manual_zone2_duration if manual_zone2_duration > 0 else 5 }}"
+                      - service: homeassistant.turn_off
+                        target:
+                          entity_id: "{{ zones_zone2 }}"
+
+                  # Zone 3 (only if enabled)
+                  - if:
+                      - condition: template
+                        value_template: "{{ enable_zone3 and zones_zone3 | length > 0 }}"
+                    then:
+                      - service: homeassistant.turn_on
+                        target:
+                          entity_id: "{{ zones_zone3 }}"
+                      - delay:
+                          minutes: "{{ manual_zone3_duration if manual_zone3_duration > 0 else 5 }}"
+                      - service: homeassistant.turn_off
+                        target:
+                          entity_id: "{{ zones_zone3 }}"
+
+                  # Zone 4 (only if enabled)
+                  - if:
+                      - condition: template
+                        value_template: "{{ enable_zone4 and zones_zone4 | length > 0 }}"
+                    then:
+                      - service: homeassistant.turn_on
+                        target:
+                          entity_id: "{{ zones_zone4 }}"
+                      - delay:
+                          minutes: "{{ manual_zone4_duration if manual_zone4_duration > 0 else 7 }}"
+                      - service: homeassistant.turn_off
+                        target:
+                          entity_id: "{{ zones_zone4 }}"
+
+          - if:
+              - condition: template
+                value_template: "{{ pump is defined }}"
+            then:
+              - service: switch.turn_off
+                target:
+                  entity_id: !input pump
+
+          - if:
+              - condition: template
+                value_template: "{{ water_calc and water_rate > 0 }}"
+            then:
+              - service: persistent_notification.create
+                data:
+                  title: Water usage
+                  message: >
+                    Water used: {{
+                      ( (manual_zone1_duration if manual_zone1_duration > 0 else 10) +
+                        (enable_zone2 and (manual_zone2_duration if manual_zone2_duration > 0 else 5) or 0) +
+                        (enable_zone3 and (manual_zone3_duration if manual_zone3_duration > 0 else 5) or 0) +
+                        (enable_zone4 and (manual_zone4_duration if manual_zone4_duration > 0 else 7) or 0)
+                      ) * water_rate
+                    }} gallons.
+
+mode: single
