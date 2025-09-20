@@ -6,6 +6,8 @@ blueprint:
     pump control, water consumption tracking, and notifications. Supports both parallel and sequential watering modes
     with manual override capabilities.
   domain: automation
+  homeassistant:
+    min_version: "2024.6.0"
   input:
     input_sections:
       zone_config:
