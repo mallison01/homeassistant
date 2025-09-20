@@ -123,7 +123,7 @@ blueprint:
     # Water Source Configuration
     water_source:
       name: 💧 Select Water Source
-      description: Choose your water source. Select "Tap Water" for unlimited mains water supply, or "Rainwater/Cistern" for tank-based systems with level monitoring.
+      description: "Choose your water source. Select 'Tap Water' for unlimited mains water supply, or 'Rainwater/Cistern' for tank-based systems with level monitoring."
       default: "tap_water"
       selector:
         select:
@@ -172,7 +172,7 @@ blueprint:
     # Soil Moisture Configuration
     soil_moisture_sensor:
       name: 💧 Soil Moisture Sensor (Optional)
-      description: Sensor that reports soil moisture as a percentage (0-100%). Watering will be skipped if moisture level is above the threshold. Helps conserve water and prevent overwatering.
+      description: "Sensor that reports soil moisture as a percentage (0-100%). Watering will be skipped if moisture level is above the threshold. Helps conserve water and prevent overwatering."
       default: null
       selector:
         entity:
@@ -180,14 +180,14 @@ blueprint:
 
     use_soil_moisture:
       name: 💧 Use Soil Moisture Check?
-      description: Enable automatic soil moisture checking before watering. If enabled, watering will be skipped when soil moisture is above the threshold.
+      description: "Enable automatic soil moisture checking before watering. If enabled, watering will be skipped when soil moisture is above the threshold."
       default: false
       selector:
         boolean: {}
 
     soil_moisture_threshold:
       name: 💧 Soil Moisture Threshold (%)
-      description: Skip watering if soil moisture percentage is above this value. Typical values are 30-50% depending on plant needs and sensor calibration.
+      description: "Skip watering if soil moisture percentage is above this value. Typical values are 30-50% depending on plant needs and sensor calibration."
       default: 30
       selector:
         number:
@@ -214,7 +214,7 @@ blueprint:
 
     rain_live_sensor:
       name: 🌧️ Rain Detection Sensor (Optional)
-      description: Binary sensor that detects active rain (on = rain detected, off = no rain). Watering will be immediately stopped if rain is detected during operation.
+      description: "Binary sensor that detects active rain (on = rain detected, off = no rain). Watering will be immediately stopped if rain is detected during operation."
       default: null
       selector:
         entity:
@@ -223,7 +223,7 @@ blueprint:
     # Water Consumption Tracking
     water_consumption_per_minute:
       name: 📊 Water Consumption per Minute (Liters)
-      description: Optional: Average water consumption rate in liters per minute for all zones combined. Used to calculate and report total water usage after each watering cycle.
+      description: "Optional: Average water consumption rate in liters per minute for all zones combined. Used to calculate and report total water usage after each watering cycle."
       default: 0
       selector:
         number:
@@ -233,7 +233,7 @@ blueprint:
 
     enable_water_consumption:
       name: 📊 Enable Water Consumption Calculation?
-      description: Enable automatic calculation and notification of water usage after each watering cycle. Requires water consumption rate to be set above.
+      description: "Enable automatic calculation and notification of water usage after each watering cycle. Requires water consumption rate to be set above."
       default: false
       selector:
         boolean: {}
@@ -241,7 +241,7 @@ blueprint:
     # Flexible Start Time Configuration
     start_time_option:
       name: ⏰ Choose Start Time Option
-      description: Select how automatic watering should be scheduled. Choose fixed time for specific schedule, night for 2 AM watering, or sunrise/sunset with custom offset.
+      description: "Select how automatic watering should be scheduled. Choose fixed time for specific schedule, night for 2 AM watering, or sunrise/sunset with custom offset."
       default: fixed_time
       selector:
         select:
@@ -257,14 +257,14 @@ blueprint:
 
     fixed_start_time:
       name: ⏰ Fixed Start Time
-      description: Specific time to start automatic watering (only used when 'Fixed Time' is selected above). Format: HH:MM (24-hour format).
+      description: "Specific time to start automatic watering (only used when 'Fixed Time' is selected above). Format: HH:MM (24-hour format)."
       default: "06:00:00"
       selector:
         time: {}
 
     start_time_offset:
       name: ⏰ Offset for Sunrise/Sunset (Minutes)
-      description: Time offset in minutes for sunrise/sunset scheduling. Positive values = later (after sunrise/sunset), negative values = earlier (before sunrise/sunset).
+      description: "Time offset in minutes for sunrise/sunset scheduling. Positive values = later (after sunrise/sunset), negative values = earlier (before sunrise/sunset)."
       default: 0
       selector:
         number:
@@ -274,7 +274,7 @@ blueprint:
     # Watering Mode Configuration
     parallel_watering:
       name: 🤖 Irrigation Mode - Parallel or Sequential?
-      description: Choose watering mode. True = Parallel (all zones water simultaneously), False = Sequential (zones water one after another with individual durations).
+      description: "Choose watering mode. True = Parallel (all zones water simultaneously), False = Sequential (zones water one after another with individual durations)."
       default: false
       selector:
         boolean: {}
