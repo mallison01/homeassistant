@@ -126,7 +126,7 @@ blueprint:
     schedule_timing:
         name: ⏰ Schedule & Timing
         description: Configure when automatic watering should occur and watering modes.
-        collapsed: false
+        collapsed: true
         input:
           start_time_option:
             name: ⏰ Choose Start Time Option
