@@ -1,0 +1,748 @@
+blueprint:
+  name: Advanced Motion Activated Lighting
+  description: >
+    Turn lights on when motion is detected or doors open, with multiple optional conditions
+    and occupancy detection to keep lights on while room is occupied.
+  domain: automation
+  input:
+    trigger_sensors:
+      name: Trigger Sensors Configuration
+      description: Selector the Triggers.
+      collapsed: true
+      input:
+        # === TRIGGER SENSORS ===
+        binary_sensors:
+          name: Binary Sensors
+          description: Select one or more binary sensors that will trigger the automation (motion sensors, door sensors, window sensors, PIR sensors, etc.)
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: binary_sensor
+        
+        # === OCCUPANCY DETECTION ===
+        enable_occupancy_sensor:
+          name: "Enable Occupancy Detection"
+          description: Use additional sensor to detect room occupancy
+          default: false
+          selector:
+            boolean:
+        
+        occupancy_sensors:
+          name: "Occupancy Sensors"
+          description: Additional sensors to detect room occupancy - lights stay on while these are active (only used if Occupancy Detection is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: binary_sensor
+        
+        wait_for_all_sensors:
+          name: Wait for All Sensors to Clear
+          description: Wait until ALL binary sensors (triggers and occupancy sensors if enabled) are clear before starting timer. If disabled and occupancy detection is also disabled, timer starts immediately after initial trigger clears.
+          default: true
+          selector:
+            boolean:
+        
+        wait_for_clear_duration:
+          name: Sensor Clear Wait Duration
+          description: How long all sensors must remain clear before starting the turn-off timer (only used if Wait for All Sensors to Clear is enabled)
+          default:
+            seconds: 30
+          selector:
+            duration:
+        
+    # === LIGHTS AND SWITCHES ===
+    lights_scenes:
+      name: Lights and Scenes Configuration
+      description: Select the Lights and Scenes.
+      collapsed: true
+      input:
+        switches:
+          name: Lights or Switches to Turn On
+          description: Select lights, switches, or other devices to turn on when motion is detected
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+                - domain: switch
+                - domain: fan
+        
+        turn_off_lights:
+          name: Turn Off Individual Lights/Switches
+          description: Turn off the individual lights and switches when timer expires
+          default: true
+          selector:
+            boolean:
+        
+        # === SCENES ===
+        on_scene:
+          name: Scene to Activate (Optional)
+          description: Scene to activate when motion is detected (in addition to individual lights)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: scene
+        
+        off_scene:
+          name: Scene to Activate When Turning Off (Optional)
+          description: Scene to activate when turning off (in addition to or instead of turning off individual lights)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: scene
+        
+        # === EXTRA TURN OFF OPTIONS ===
+        enable_extra_turnoff:
+          name: "Enable Extra Turn Off"
+          description: Turn off additional devices/scenes when timer expires
+          default: false
+          selector:
+            boolean:
+        
+        extra_devices:
+          name: "Extra Devices to Turn Off"
+          description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+                - domain: switch
+                - domain: fan
+        
+        extra_off_scenes:
+          name: "Extra Scenes to Activate"
+          description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: scene
+        
+        # === TIMER ===
+        timer_duration:
+          name: Timer Duration
+          description: How long to wait before turning off lights after all sensors are clear
+          default:
+            minutes: 5
+          selector:
+            duration:
+        
+    # === LIGHT CONTROL OPTIONS ===
+    light_control:
+      name: Light Control Configuration
+      description: Select the Light Control Options.
+      collapsed: true
+      input:
+        enable_light_control:
+          name: "Enable Light Control Options"
+          description: Enable advanced light control settings (brightness, transition, color)
+          default: false
+          selector:
+            boolean:
+        
+        include_light_control:
+          name: Light Control Options (Optional)
+          description: >
+            Select if you would like to use brightness or transition.
+            These settings will only affect a 'light' entity that supports each selected option.
+            The settings for brightness and transition are provided below.
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: Use Brightness
+                  value: "use_brightness"
+                - label: Use Transition
+                  value: "use_transition"
+        
+        light_brightness:
+          name: Brightness
+          description: >
+            The brightness setting for the lights when they are turned ON.
+          default: 100
+          selector:
+            number:
+              min: 1
+              max: 100
+              mode: slider
+              step: 1
+              unit_of_measurement: '%'
+        
+        light_transition_on:
+          name: Transition - ON
+          description: >
+            The transition setting for the lights when they are turned ON.
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 5
+              mode: slider
+              step: 0.5
+              unit_of_measurement: seconds
+        
+        light_transition_off:
+          name: Transition - OFF
+          description: >
+            The transition setting for the lights when they are turned OFF.
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 30
+              mode: slider
+              step: 1
+              unit_of_measurement: seconds
+        
+        include_light_colour_control:
+          name: Light Colour Control Options (Optional)
+          description: >
+            Select if you would like to use colour temperature, RGB, RGBW or RGBWW colour.
+            These settings will only affect a 'light' entity that supports each selected option.
+            The settings for colour temperature, RGB, RGBW and RGBWW colour are provided below.
+          default: disable_colour_control
+          selector:
+            select:
+              options:
+                - label: Use Colour Temperature
+                  value: "use_colour_temperature"
+                - label: Use RGB Colour
+                  value: "use_rgb_colour"
+                - label: Use RGBW Colour
+                  value: "use_rgbw_colour"
+                - label: Use RGBWW Colour
+                  value: "use_rgbww_colour"
+                - label: Disable Colour Control
+                  value: "disable_colour_control"
+        
+        light_colour_temperature:
+          name: Colour Temperature
+          description: >
+            The colour temperature setting for the lights when they are turned ON.
+          default: 5000
+          selector:
+            number:
+              min: 2000
+              max: 8000
+              mode: slider
+              step: 100
+              unit_of_measurement: 'kelvin'
+        
+        light_rgb_colour:
+          name: RGB Colour
+          description: >
+            The RGB colour setting for the lights when they are turned ON.
+          default: [255, 255, 255]
+          selector:
+            color_rgb:
+        
+        light_rgbw_colour:
+          name: RGBW Colour
+          description: >
+            The RGBW colour setting for the lights when they are turned ON.
+            Enter four integers between 0 and 255 to define the values for Red, Green, Blue, and White.
+          default: [255, 255, 255, 255]
+          selector:
+            object:
+        
+        light_rgbww_colour:
+          name: RGBWW Colour
+          description: >
+            The RGBWW colour setting for the lights when they are turned ON.
+            Enter five integers between 0 and 255 to define the values for Red, Green, Blue, Cold White and Warm White.
+          default: [255, 255, 255, 255, 255]
+          selector:
+            object:
+        
+    # === OPTIONAL CONDITIONS ===
+    # Time Restrictions
+    time_config:
+      name: Time Restriction Configuration
+      description: Select the Start and Stop time and days of the week.
+      collapsed: true
+      input:
+        enable_time_restriction:
+          name: "Enable Time Restrictions"
+          description: Only run automation between certain times
+          default: false
+          selector:
+            boolean:
+        
+        start_time:
+          name: "Start Time"
+          description: Earliest time to run automation (only used if Time Restrictions is enabled)
+          default: "00:00:00"
+          selector:
+            time:
+        
+        end_time:
+          name: "End Time"
+          description: Latest time to run automation (only used if Time Restrictions is enabled)
+          default: "23:59:59"
+          selector:
+            time:
+        
+            # Day Restrictions
+        enable_day_restriction:
+          name: "Enable Day of Week Restrictions"
+          description: Only run automation on selected days
+          default: false
+          selector:
+            boolean:
+        
+        allowed_days:
+          name: "Allowed Days"
+          description: Days when automation is allowed to run (only used if Day Restrictions is enabled)
+          default:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: "Monday"
+                  value: "mon"
+                - label: "Tuesday"
+                  value: "tue"
+                - label: "Wednesday"
+                  value: "wed"
+                - label: "Thursday"
+                  value: "thu"
+                - label: "Friday"
+                  value: "fri"
+                - label: "Saturday"
+                  value: "sat"
+                - label: "Sunday"
+                  value: "sun"
+        
+    # Device Tracking
+    tracking_config:
+      name: Device Tracking Configuration
+      description: Select the Devices and zones.
+      collapsed: true
+      input:
+        enable_device_tracking:
+          name: "Enable Device Tracking"
+          description: Enable device presence checking
+          default: false
+          selector:
+            boolean:
+        
+        tracked_device:
+          name: "Device to Track"
+          description: Device that must be present/absent for automation to run (only used if Device Tracking is enabled)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: device_tracker
+                - domain: person
+        
+        device_zone:
+          name: "Zone for Device Check"
+          description: Zone where device should be present for automation to run (only used if Device Tracking is enabled)
+          default: []
+          selector:
+            entity:
+              filter:
+                - domain: zone
+        
+        device_presence_required:
+          name: "Device Must Be Present"
+          description: If enabled, device must be in zone. If disabled, device must NOT be in zone (only used if Device Tracking is enabled)
+          default: true
+          selector:
+            boolean:
+        
+    # Light Sensor Restrictions
+    ambient_light:
+      name: Ambient Configuration
+      description: Select the Light sensor and settings.
+      collapsed: true
+      input:
+        enable_light_sensor:
+          name: "Enable Light Sensor"
+          description: Only run when light level is below threshold
+          default: false
+          selector:
+            boolean:
+        
+        light_sensor:
+          name: "Light Sensor"
+          description: Sensor to check light level (only used if Light Sensor is enabled)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - device_class: illuminance
+        
+        light_threshold:
+          name: "Light Threshold"
+          description: Light level below which automation runs (only used if Light Sensor is enabled)
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 1000
+              step: 10
+              unit_of_measurement: lux
+        
+variables:
+  binary_sensors: !input binary_sensors
+  switches: !input switches
+  enable_light_control: !input enable_light_control
+  include_light_control: !input include_light_control
+  light_brightness: !input light_brightness
+  light_transition_on: !input light_transition_on
+  light_transition_off: !input light_transition_off
+  include_light_colour_control: !input include_light_colour_control
+  light_colour_temperature: !input light_colour_temperature
+  light_rgb_colour: !input light_rgb_colour
+  light_rgbw_colour: !input light_rgbw_colour
+  light_rgbww_colour: !input light_rgbww_colour
+  on_scene: !input on_scene
+  off_scene: !input off_scene
+  turn_off_lights: !input turn_off_lights
+  timer_duration: !input timer_duration
+  enable_device_tracking: !input enable_device_tracking
+  tracked_device: !input tracked_device
+  device_zone: !input device_zone
+  device_presence_required: !input device_presence_required
+  enable_time_restriction: !input enable_time_restriction
+  start_time: !input start_time
+  end_time: !input end_time
+  enable_day_restriction: !input enable_day_restriction
+  allowed_days: !input allowed_days
+  enable_light_sensor: !input enable_light_sensor
+  light_sensor: !input light_sensor
+  light_threshold: !input light_threshold
+  enable_occupancy_sensor: !input enable_occupancy_sensor
+  occupancy_sensors: !input occupancy_sensors
+  wait_for_all_sensors: !input wait_for_all_sensors
+  wait_for_clear_duration: !input wait_for_clear_duration
+  enable_extra_turnoff: !input enable_extra_turnoff
+  extra_devices: !input extra_devices
+  extra_off_scenes: !input extra_off_scenes
+
+  # Create light data for turning on
+  light_data: >-
+    {% set light = namespace(data={}) %}
+    {% if enable_light_control and 'use_brightness' in include_light_control %}
+      {% set light.data = dict(light.data, **{ 'brightness_pct': light_brightness }) %}
+    {% endif %}
+    {% if enable_light_control and 'use_transition' in include_light_control %}
+      {% set light.data = dict(light.data, **{ 'transition': light_transition_on }) %}
+    {% endif %}
+    {% if enable_light_control and include_light_colour_control == 'use_colour_temperature' %}
+      {% set light.data = dict(light.data, **{ 'kelvin': light_colour_temperature }) %}
+    {% elif enable_light_control and include_light_colour_control == 'use_rgb_colour' %}
+      {% set light.data = dict(light.data, **{ 'rgb_color': light_rgb_colour }) %}
+    {% elif enable_light_control and include_light_colour_control == 'use_rgbw_colour' %}
+      {% set light.data = dict(light.data, **{ 'rgbw_color': light_rgbw_colour }) %}
+    {% elif enable_light_control and include_light_colour_control == 'use_rgbww_colour' %}
+      {% set light.data = dict(light.data, **{ 'rgbww_color': light_rgbww_colour }) %}
+    {% endif %}
+    {{ light.data }}
+
+  # Split entities by domain
+  light_entities: >
+    {{ switches | select('match', '^light\\.') | list }}
+  switch_entities: >
+    {{ switches | reject('match', '^light\\.') | list }}
+
+trigger:
+  - platform: state
+    entity_id: !input binary_sensors
+    to: 
+      - "on"
+      - "open"
+      - "detected"
+    id: "motion_detected"
+  - platform: state
+    entity_id: !input binary_sensors
+    to:
+      - "off"
+      - "closed"
+      - "clear"
+    id: "motion_cleared"
+
+# Check all conditions before automation runs
+condition:
+  # Check device tracking condition
+  - condition: or
+    conditions:
+      - condition: template
+        value_template: "{{ not enable_device_tracking }}"
+      - condition: and
+        conditions:
+          - condition: template
+            value_template: "{{ enable_device_tracking }}"
+          - condition: template
+            value_template: >
+              {% if device_presence_required %}
+                {{ is_state(tracked_device, device_zone) }}
+              {% else %}
+                {{ not is_state(tracked_device, device_zone) }}
+              {% endif %}
+  
+  # Check time restriction
+  - condition: or
+    conditions:
+      - condition: template
+        value_template: "{{ not enable_time_restriction }}"
+      - condition: time
+        after: !input start_time
+        before: !input end_time
+  
+  # Check day restriction
+  - condition: or
+    conditions:
+      - condition: template
+        value_template: "{{ not enable_day_restriction }}"
+      - condition: template
+        value_template: "{{ now().strftime('%a')|lower in allowed_days }}"
+  
+  # Check light sensor
+  - condition: or
+    conditions:
+      - condition: template
+        value_template: "{{ not enable_light_sensor }}"
+      - condition: template
+        value_template: "{{ light_sensor == '' }}"
+      - condition: template
+        value_template: >
+          {{ enable_light_sensor and light_sensor != '' and 
+             states(light_sensor)|float(1000) < light_threshold }}
+
+action:
+  - choose:
+      # Motion/Door Detected - Turn On Lights
+      - conditions:
+          - condition: trigger
+            id: "motion_detected"
+        sequence:
+          # Turn on individual lights/switches with advanced controls
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ switches | length > 0 }}"
+                sequence:
+                  # Turn on lights with advanced controls if enabled
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ enable_light_control and light_entities | length > 0 }}"
+                        sequence:
+                          - service: light.turn_on
+                            data: "{{ light_data }}"
+                            entity_id: "{{ light_entities }}"
+                      # Turn on lights without advanced controls if disabled
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ not enable_light_control and light_entities | length > 0 }}"
+                        sequence:
+                          - service: homeassistant.turn_on
+                            entity_id: "{{ light_entities }}"
+                  
+                  # Turn on non-light devices (switches, fans, etc.)
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ switch_entities | length > 0 }}"
+                        sequence:
+                          - service: homeassistant.turn_on
+                            entity_id: "{{ switch_entities }}"
+          
+          # Activate on scene if specified
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ on_scene != '' }}"
+                sequence:
+                  - service: scene.turn_on
+                    target:
+                      entity_id: !input on_scene
+      
+      # Motion/Door Cleared - Start Timer with Sensor Monitoring
+      - conditions:
+          - condition: trigger
+            id: "motion_cleared"
+        sequence:
+          # Timer with sensor monitoring - will reset if any sensor activates
+          - repeat:
+              while:
+                - condition: template
+                  value_template: "{{ true }}"
+              sequence:
+                # Combined wait for all sensors and timer with continuous monitoring
+                - repeat:
+                    while:
+                      - condition: or
+                        conditions:
+                          # Check if we need to wait for all binary sensors to be clear
+                          - condition: and
+                            conditions:
+                              - condition: template
+                                value_template: "{{ wait_for_all_sensors }}"
+                              - condition: template
+                                value_template: >
+                                  {{ binary_sensors | select('is_state', ['on', 'open', 'detected']) | list | length > 0 }}
+                          # Check if any occupancy sensors are active
+                          - condition: and
+                            conditions:
+                              - condition: template
+                                value_template: "{{ enable_occupancy_sensor and wait_for_all_sensors }}"
+                              - condition: template
+                                value_template: >
+                                  {{ occupancy_sensors | select('is_state', ['on', 'open', 'detected']) | list | length > 0 }}
+                    sequence:
+                      # Wait for sensors to clear
+                      - wait_template: >
+                          {% set motion_clear = true %}
+                          {% set occupancy_clear = true %}
+                          
+                          {% if wait_for_all_sensors %}
+                            {% set motion_clear = binary_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
+                          {% endif %}
+                          
+                          {% if enable_occupancy_sensor and wait_for_all_sensors %}
+                            {% set occupancy_clear = occupancy_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
+                          {% endif %}
+                          
+                          {{ motion_clear and occupancy_clear }}
+                
+                # Wait for all sensors to remain clear for the specified duration
+                - choose:
+                    - conditions:
+                        - condition: template
+                          value_template: "{{ wait_for_all_sensors }}"
+                      sequence:
+                        - delay: !input wait_for_clear_duration
+                
+                - wait_for_trigger:
+                    - platform: state
+                      entity_id: !input binary_sensors
+                      to: 
+                        - "on"
+                        - "open"
+                        - "detected"
+                    - platform: state
+                      entity_id: !input occupancy_sensors
+                      to:
+                        - "on" 
+                        - "open"
+                        - "detected"
+                  timeout: !input timer_duration
+                  continue_on_timeout: true
+                
+                # Check if we timed out (no sensor activity) or if a sensor triggered
+                - choose:
+                    # If we timed out without any sensor activity, turn off lights and exit
+                    - conditions:
+                        - condition: template
+                          value_template: "{{ wait.trigger is none }}"
+                      sequence:
+                        # Turn off lights and/or activate off scene
+                        - choose:
+                            # Turn off individual lights/switches if enabled
+                            - conditions:
+                                - condition: template
+                                  value_template: "{{ turn_off_lights and switches | length > 0 }}"
+                              sequence:
+                                # Turn off lights with transition if light control enabled
+                                - choose:
+                                    - conditions:
+                                        - condition: template
+                                          value_template: "{{ enable_light_control and 'use_transition' in include_light_control and light_entities | length > 0 }}"
+                                      sequence:
+                                        - service: light.turn_off
+                                          data:
+                                            transition: "{{ light_transition_off }}"
+                                          entity_id: "{{ light_entities }}"
+                                    # Turn off lights without transition
+                                    - conditions:
+                                        - condition: template
+                                          value_template: "{{ light_entities | length > 0 }}"
+                                      sequence:
+                                        - service: homeassistant.turn_off
+                                          entity_id: "{{ light_entities }}"
+                                
+                                # Turn off non-light devices (switches, fans, etc.)
+                                - choose:
+                                    - conditions:
+                                        - condition: template
+                                          value_template: "{{ switch_entities | length > 0 }}"
+                                      sequence:
+                                        - service: homeassistant.turn_off
+                                          entity_id: "{{ switch_entities }}"
+                        
+                        # Activate off scene if specified
+                        - choose:
+                            - conditions:
+                                - condition: template
+                                  value_template: "{{ off_scene != '' }}"
+                              sequence:
+                                - service: scene.turn_on
+                                  target:
+                                    entity_id: !input off_scene
+                        
+                        # Turn off extra devices if enabled
+                        - choose:
+                            - conditions:
+                                - condition: template
+                                  value_template: "{{ enable_extra_turnoff }}"
+                              sequence:
+                                - choose:
+                                    - conditions:
+                                        - condition: template
+                                          value_template: "{{ extra_devices | length > 0 }}"
+                                      sequence:
+                                        - service: homeassistant.turn_off
+                                          entity_id: "{{ extra_devices }}"
+                                - choose:
+                                    - conditions:
+                                        - condition: template
+                                          value_template: "{{ extra_off_scenes | length > 0 }}"
+                                      sequence:
+                                        - service: scene.turn_on
+                                          entity_id: "{{ extra_off_scenes }}"
+                        
+                        # Break out of the repeat loop
+                        - stop: "Timer completed without sensor activity"
+                    
+                    # If a sensor triggered, continue the loop (timer resets)
+                    - conditions:
+                        - condition: template
+                          value_template: "{{ wait.trigger is not none }}"
+                      sequence:
+                        # Wait for all sensors to clear again before restarting timer
+                        - wait_template: >
+                            {% set motion_clear = true %}
+                            {% set occupancy_clear = true %}
+                            
+                            {% if wait_for_all_sensors %}
+                              {% set motion_clear = binary_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
+                            {% endif %}
+                            
+                            {% if enable_occupancy_sensor and wait_for_all_sensors %}
+                              {% set occupancy_clear = occupancy_sensors | select('is_state', ['on', 'open', 'detected']) | list | length == 0 %}
+                            {% endif %}
+                            
+                            {{ motion_clear and occupancy_clear }}
+
+mode: single
