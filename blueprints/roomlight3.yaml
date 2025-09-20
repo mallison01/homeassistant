@@ -5,402 +5,437 @@ blueprint:
     and occupancy detection to keep lights on while room is occupied.
   domain: automation
   input:
-    # === TRIGGER SENSORS ===
-    binary_sensors:
-      name: Binary Sensors
-      description: Select one or more binary sensors that will trigger the automation (motion sensors, door sensors, window sensors, PIR sensors, etc.)
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: binary_sensor
-    
-    # === OCCUPANCY DETECTION ===
-    enable_occupancy_sensor:
-      name: "Enable Occupancy Detection"
-      description: Use additional sensor to detect room occupancy
-      default: false
-      selector:
-        boolean:
-    
-    occupancy_sensors:
-      name: "Occupancy Sensors"
-      description: Additional sensors to detect room occupancy - lights stay on while these are active (only used if Occupancy Detection is enabled)
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: binary_sensor
-    
-    wait_for_all_sensors:
-      name: Wait for All Sensors to Clear
-      description: Wait until ALL binary sensors (triggers and occupancy sensors if enabled) are clear before starting timer. If disabled and occupancy detection is also disabled, timer starts immediately after initial trigger clears.
-      default: true
-      selector:
-        boolean:
-    
-    wait_for_clear_duration:
-      name: Sensor Clear Wait Duration
-      description: How long all sensors must remain clear before starting the turn-off timer (only used if Wait for All Sensors to Clear is enabled)
-      default:
-        seconds: 30
-      selector:
-        duration:
-    
+    trigger_sensors:
+      name: Trigger Sensors Configuration
+      description: Selector the Triggers.
+      collapsed: true
+      input:
+        # === TRIGGER SENSORS ===
+        binary_sensors:
+          name: Binary Sensors
+          description: Select one or more binary sensors that will trigger the automation (motion sensors, door sensors, window sensors, PIR sensors, etc.)
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: binary_sensor
+        
+        # === OCCUPANCY DETECTION ===
+        enable_occupancy_sensor:
+          name: "Enable Occupancy Detection"
+          description: Use additional sensor to detect room occupancy
+          default: false
+          selector:
+            boolean:
+        
+        occupancy_sensors:
+          name: "Occupancy Sensors"
+          description: Additional sensors to detect room occupancy - lights stay on while these are active (only used if Occupancy Detection is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: binary_sensor
+        
+        wait_for_all_sensors:
+          name: Wait for All Sensors to Clear
+          description: Wait until ALL binary sensors (triggers and occupancy sensors if enabled) are clear before starting timer. If disabled and occupancy detection is also disabled, timer starts immediately after initial trigger clears.
+          default: true
+          selector:
+            boolean:
+        
+        wait_for_clear_duration:
+          name: Sensor Clear Wait Duration
+          description: How long all sensors must remain clear before starting the turn-off timer (only used if Wait for All Sensors to Clear is enabled)
+          default:
+            seconds: 30
+          selector:
+            duration:
+        
     # === LIGHTS AND SWITCHES ===
-    switches:
-      name: Lights or Switches to Turn On
-      description: Select lights, switches, or other devices to turn on when motion is detected
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: light
-            - domain: switch
-            - domain: fan
-    
-    turn_off_lights:
-      name: Turn Off Individual Lights/Switches
-      description: Turn off the individual lights and switches when timer expires
-      default: true
-      selector:
-        boolean:
-    
-    # === SCENES ===
-    on_scene:
-      name: Scene to Activate (Optional)
-      description: Scene to activate when motion is detected (in addition to individual lights)
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: scene
-    
-    off_scene:
-      name: Scene to Activate When Turning Off (Optional)
-      description: Scene to activate when turning off (in addition to or instead of turning off individual lights)
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: scene
-    
-    # === EXTRA TURN OFF OPTIONS ===
-    enable_extra_turnoff:
-      name: "Enable Extra Turn Off"
-      description: Turn off additional devices/scenes when timer expires
-      default: false
-      selector:
-        boolean:
-    
-    extra_devices:
-      name: "Extra Devices to Turn Off"
-      description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: light
-            - domain: switch
-            - domain: fan
-    
-    extra_off_scenes:
-      name: "Extra Scenes to Activate"
-      description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: scene
-    
-    # === TIMER ===
-    timer_duration:
-      name: Timer Duration
-      description: How long to wait before turning off lights after all sensors are clear
-      default:
-        minutes: 5
-      selector:
-        duration:
-    
+    lights_scenes:
+      name: Lights and Scenes Configuration
+      description: Select the Lights and Scenes.
+      collapsed: true
+      input:
+        switches:
+          name: Lights or Switches to Turn On
+          description: Select lights, switches, or other devices to turn on when motion is detected
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+                - domain: switch
+                - domain: fan
+        
+        turn_off_lights:
+          name: Turn Off Individual Lights/Switches
+          description: Turn off the individual lights and switches when timer expires
+          default: true
+          selector:
+            boolean:
+        
+        # === SCENES ===
+        on_scene:
+          name: Scene to Activate (Optional)
+          description: Scene to activate when motion is detected (in addition to individual lights)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: scene
+        
+        off_scene:
+          name: Scene to Activate When Turning Off (Optional)
+          description: Scene to activate when turning off (in addition to or instead of turning off individual lights)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: scene
+        
+        # === EXTRA TURN OFF OPTIONS ===
+        enable_extra_turnoff:
+          name: "Enable Extra Turn Off"
+          description: Turn off additional devices/scenes when timer expires
+          default: false
+          selector:
+            boolean:
+        
+        extra_devices:
+          name: "Extra Devices to Turn Off"
+          description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+                - domain: switch
+                - domain: fan
+        
+        extra_off_scenes:
+          name: "Extra Scenes to Activate"
+          description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: scene
+        
+        # === TIMER ===
+        timer_duration:
+          name: Timer Duration
+          description: How long to wait before turning off lights after all sensors are clear
+          default:
+            minutes: 5
+          selector:
+            duration:
+        
     # === LIGHT CONTROL OPTIONS ===
-    enable_light_control:
-      name: "Enable Light Control Options"
-      description: Enable advanced light control settings (brightness, transition, color)
-      default: false
-      selector:
-        boolean:
-    
-    include_light_control:
-      name: Light Control Options (Optional)
-      description: >
-        Select if you would like to use brightness or transition.
-        These settings will only affect a 'light' entity that supports each selected option.
-        The settings for brightness and transition are provided below.
-      default: []
-      selector:
-        select:
-          multiple: true
-          options:
-            - label: Use Brightness
-              value: "use_brightness"
-            - label: Use Transition
-              value: "use_transition"
-    
-    light_brightness:
-      name: Brightness
-      description: >
-        The brightness setting for the lights when they are turned ON.
-      default: 100
-      selector:
-        number:
-          min: 1
-          max: 100
-          mode: slider
-          step: 1
-          unit_of_measurement: '%'
-    
-    light_transition_on:
-      name: Transition - ON
-      description: >
-        The transition setting for the lights when they are turned ON.
-      default: 1
-      selector:
-        number:
-          min: 0
-          max: 5
-          mode: slider
-          step: 0.5
-          unit_of_measurement: seconds
-    
-    light_transition_off:
-      name: Transition - OFF
-      description: >
-        The transition setting for the lights when they are turned OFF.
-      default: 1
-      selector:
-        number:
-          min: 0
-          max: 30
-          mode: slider
-          step: 1
-          unit_of_measurement: seconds
-    
-    include_light_colour_control:
-      name: Light Colour Control Options (Optional)
-      description: >
-        Select if you would like to use colour temperature, RGB, RGBW or RGBWW colour.
-        These settings will only affect a 'light' entity that supports each selected option.
-        The settings for colour temperature, RGB, RGBW and RGBWW colour are provided below.
-      default: disable_colour_control
-      selector:
-        select:
-          options:
-            - label: Use Colour Temperature
-              value: "use_colour_temperature"
-            - label: Use RGB Colour
-              value: "use_rgb_colour"
-            - label: Use RGBW Colour
-              value: "use_rgbw_colour"
-            - label: Use RGBWW Colour
-              value: "use_rgbww_colour"
-            - label: Disable Colour Control
-              value: "disable_colour_control"
-    
-    light_colour_temperature:
-      name: Colour Temperature
-      description: >
-        The colour temperature setting for the lights when they are turned ON.
-      default: 5000
-      selector:
-        number:
-          min: 2000
-          max: 8000
-          mode: slider
-          step: 100
-          unit_of_measurement: 'kelvin'
-    
-    light_rgb_colour:
-      name: RGB Colour
-      description: >
-        The RGB colour setting for the lights when they are turned ON.
-      default: [255, 255, 255]
-      selector:
-        color_rgb:
-    
-    light_rgbw_colour:
-      name: RGBW Colour
-      description: >
-        The RGBW colour setting for the lights when they are turned ON.
-        Enter four integers between 0 and 255 to define the values for Red, Green, Blue, and White.
-      default: [255, 255, 255, 255]
-      selector:
-        object:
-    
-    light_rgbww_colour:
-      name: RGBWW Colour
-      description: >
-        The RGBWW colour setting for the lights when they are turned ON.
-        Enter five integers between 0 and 255 to define the values for Red, Green, Blue, Cold White and Warm White.
-      default: [255, 255, 255, 255, 255]
-      selector:
-        object:
-    
+    light_control:
+      name: Light Control Configuration
+      description: Select the Light Control Options.
+      collapsed: true
+      input:
+        enable_light_control:
+          name: "Enable Light Control Options"
+          description: Enable advanced light control settings (brightness, transition, color)
+          default: false
+          selector:
+            boolean:
+        
+        include_light_control:
+          name: Light Control Options (Optional)
+          description: >
+            Select if you would like to use brightness or transition.
+            These settings will only affect a 'light' entity that supports each selected option.
+            The settings for brightness and transition are provided below.
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: Use Brightness
+                  value: "use_brightness"
+                - label: Use Transition
+                  value: "use_transition"
+        
+        light_brightness:
+          name: Brightness
+          description: >
+            The brightness setting for the lights when they are turned ON.
+          default: 100
+          selector:
+            number:
+              min: 1
+              max: 100
+              mode: slider
+              step: 1
+              unit_of_measurement: '%'
+        
+        light_transition_on:
+          name: Transition - ON
+          description: >
+            The transition setting for the lights when they are turned ON.
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 5
+              mode: slider
+              step: 0.5
+              unit_of_measurement: seconds
+        
+        light_transition_off:
+          name: Transition - OFF
+          description: >
+            The transition setting for the lights when they are turned OFF.
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 30
+              mode: slider
+              step: 1
+              unit_of_measurement: seconds
+        
+        include_light_colour_control:
+          name: Light Colour Control Options (Optional)
+          description: >
+            Select if you would like to use colour temperature, RGB, RGBW or RGBWW colour.
+            These settings will only affect a 'light' entity that supports each selected option.
+            The settings for colour temperature, RGB, RGBW and RGBWW colour are provided below.
+          default: disable_colour_control
+          selector:
+            select:
+              options:
+                - label: Use Colour Temperature
+                  value: "use_colour_temperature"
+                - label: Use RGB Colour
+                  value: "use_rgb_colour"
+                - label: Use RGBW Colour
+                  value: "use_rgbw_colour"
+                - label: Use RGBWW Colour
+                  value: "use_rgbww_colour"
+                - label: Disable Colour Control
+                  value: "disable_colour_control"
+        
+        light_colour_temperature:
+          name: Colour Temperature
+          description: >
+            The colour temperature setting for the lights when they are turned ON.
+          default: 5000
+          selector:
+            number:
+              min: 2000
+              max: 8000
+              mode: slider
+              step: 100
+              unit_of_measurement: 'kelvin'
+        
+        light_rgb_colour:
+          name: RGB Colour
+          description: >
+            The RGB colour setting for the lights when they are turned ON.
+          default: [255, 255, 255]
+          selector:
+            color_rgb:
+        
+        light_rgbw_colour:
+          name: RGBW Colour
+          description: >
+            The RGBW colour setting for the lights when they are turned ON.
+            Enter four integers between 0 and 255 to define the values for Red, Green, Blue, and White.
+          default: [255, 255, 255, 255]
+          selector:
+            object:
+        
+        light_rgbww_colour:
+          name: RGBWW Colour
+          description: >
+            The RGBWW colour setting for the lights when they are turned ON.
+            Enter five integers between 0 and 255 to define the values for Red, Green, Blue, Cold White and Warm White.
+          default: [255, 255, 255, 255, 255]
+          selector:
+            object:
+        
     # === OPTIONAL CONDITIONS ===
     # Time Restrictions
-    enable_time_restriction:
-      name: "Enable Time Restrictions"
-      description: Only run automation between certain times
-      default: false
-      selector:
-        boolean:
-    
-    start_time:
-      name: "Start Time"
-      description: Earliest time to run automation (only used if Time Restrictions is enabled)
-      default: "00:00:00"
-      selector:
-        time:
-    
-    end_time:
-      name: "End Time"
-      description: Latest time to run automation (only used if Time Restrictions is enabled)
-      default: "23:59:59"
-      selector:
-        time:
-    
+    time_config:
+      name: Time Restriction Configuration
+      description: Select the Start and Stop time and days of the week.
+      collapsed: true
+      input:
+        enable_time_restriction:
+          name: "Enable Time Restrictions"
+          description: Only run automation between certain times
+          default: false
+          selector:
+            boolean:
+        
+        start_time:
+          name: "Start Time"
+          description: Earliest time to run automation (only used if Time Restrictions is enabled)
+          default: "00:00:00"
+          selector:
+            time:
+        
+        end_time:
+          name: "End Time"
+          description: Latest time to run automation (only used if Time Restrictions is enabled)
+          default: "23:59:59"
+          selector:
+            time:
+        
+            # Day Restrictions
+        enable_day_restriction:
+          name: "Enable Day of Week Restrictions"
+          description: Only run automation on selected days
+          default: false
+          selector:
+            boolean:
+        
+        allowed_days:
+          name: "Allowed Days"
+          description: Days when automation is allowed to run (only used if Day Restrictions is enabled)
+          default:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: "Monday"
+                  value: "mon"
+                - label: "Tuesday"
+                  value: "tue"
+                - label: "Wednesday"
+                  value: "wed"
+                - label: "Thursday"
+                  value: "thu"
+                - label: "Friday"
+                  value: "fri"
+                - label: "Saturday"
+                  value: "sat"
+                - label: "Sunday"
+                  value: "sun"
+        
     # Device Tracking
-    enable_device_tracking:
-      name: "Enable Device Tracking"
-      description: Enable device presence checking
-      default: false
-      selector:
-        boolean:
-    
-    tracked_device:
-      name: "Device to Track"
-      description: Device that must be present/absent for automation to run (only used if Device Tracking is enabled)
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: device_tracker
-            - domain: person
-    
-    device_zone:
-      name: "Zone for Device Check"
-      description: Zone where device should be present for automation to run (only used if Device Tracking is enabled)
-      default: []
-      selector:
-        entity:
-          filter:
-            - domain: zone
-    
-    device_presence_required:
-      name: "Device Must Be Present"
-      description: If enabled, device must be in zone. If disabled, device must NOT be in zone (only used if Device Tracking is enabled)
-      default: true
-      selector:
-        boolean:
-    
-    # Day Restrictions
-    enable_day_restriction:
-      name: "Enable Day of Week Restrictions"
-      description: Only run automation on selected days
-      default: false
-      selector:
-        boolean:
-    
-    allowed_days:
-      name: "Allowed Days"
-      description: Days when automation is allowed to run (only used if Day Restrictions is enabled)
-      default:
-        - mon
-        - tue
-        - wed
-        - thu
-        - fri
-        - sat
-        - sun
-      selector:
-        select:
-          multiple: true
-          options:
-            - label: "Monday"
-              value: "mon"
-            - label: "Tuesday"
-              value: "tue"
-            - label: "Wednesday"
-              value: "wed"
-            - label: "Thursday"
-              value: "thu"
-            - label: "Friday"
-              value: "fri"
-            - label: "Saturday"
-              value: "sat"
-            - label: "Sunday"
-              value: "sun"
-    
+    tracking_config:
+      name: Device Tracking Configuration
+      description: Select the Devices and zones.
+      collapsed: true
+      input:
+        enable_device_tracking:
+          name: "Enable Device Tracking"
+          description: Enable device presence checking
+          default: false
+          selector:
+            boolean:
+        
+        tracked_device:
+          name: "Device to Track"
+          description: Device that must be present/absent for automation to run (only used if Device Tracking is enabled)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: device_tracker
+                - domain: person
+        
+        device_zone:
+          name: "Zone for Device Check"
+          description: Zone where device should be present for automation to run (only used if Device Tracking is enabled)
+          default: []
+          selector:
+            entity:
+              filter:
+                - domain: zone
+        
+        device_presence_required:
+          name: "Device Must Be Present"
+          description: If enabled, device must be in zone. If disabled, device must NOT be in zone (only used if Device Tracking is enabled)
+          default: true
+          selector:
+            boolean:
+        
     # Light Sensor Restrictions
-    enable_light_sensor:
-      name: "Enable Light Sensor"
-      description: Only run when light level is below threshold
-      default: false
-      selector:
-        boolean:
-    
-    light_sensor:
-      name: "Light Sensor"
-      description: Sensor to check light level (only used if Light Sensor is enabled)
-      default: ""
-      selector:
-        entity:
-          filter:
-            - device_class: illuminance
-    
-    light_threshold:
-      name: "Light Threshold"
-      description: Light level below which automation runs (only used if Light Sensor is enabled)
-      default: 100
-      selector:
-        number:
-          min: 0
-          max: 1000
-          step: 10
-          unit_of_measurement: lux
-    
+    ambient_light:
+      name: Ambient Configuration
+      description: Select the Light sensor and settings.
+      collapsed: true
+      input:
+        enable_light_sensor:
+          name: "Enable Light Sensor"
+          description: Only run when light level is below threshold
+          default: false
+          selector:
+            boolean:
+        
+        light_sensor:
+          name: "Light Sensor"
+          description: Sensor to check light level (only used if Light Sensor is enabled)
+          default: ""
+          selector:
+            entity:
+              filter:
+                - device_class: illuminance
+        
+        light_threshold:
+          name: "Light Threshold"
+          description: Light level below which automation runs (only used if Light Sensor is enabled)
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 1000
+              step: 10
+              unit_of_measurement: lux
+        
     # === EXTRA TURN OFF OPTIONS ===
-    enable_extra_turnoff:
-      name: "Enable Extra Turn Off"
-      description: Turn off additional devices/scenes when timer expires
-      default: false
-      selector:
-        boolean:
-    
-    extra_devices:
-      name: "Extra Devices to Turn Off"
-      description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: light
-            - domain: switch
-            - domain: fan
-    
-    extra_off_scenes:
-      name: "Extra Scenes to Activate"
-      description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
-      default: []
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: scene
+    extra_off:
+      name: Extra Lights and Scenes Configuration
+      description: Select the extra Lights and Scenes.
+      collapsed: true
+      input:
+        enable_extra_turnoff:
+          name: "Enable Extra Turn Off"
+          description: Turn off additional devices/scenes when timer expires
+          default: false
+          selector:
+            boolean:
+        
+        extra_devices:
+          name: "Extra Devices to Turn Off"
+          description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+                - domain: switch
+                - domain: fan
+        
+        extra_off_scenes:
+          name: "Extra Scenes to Activate"
+          description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: scene
 
 variables:
   binary_sensors: !input binary_sensors
