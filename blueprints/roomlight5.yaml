@@ -402,41 +402,6 @@ blueprint:
               step: 10
               unit_of_measurement: lux
         
-    # === EXTRA TURN OFF OPTIONS ===
-    extra_off:
-      name: Extra Lights and Scenes Configuration
-      description: Select the extra Lights and Scenes.
-      collapsed: true
-      input:
-        enable_extra_turnoff:
-          name: "Enable Extra Turn Off"
-          description: Turn off additional devices/scenes when timer expires
-          default: false
-          selector:
-            boolean:
-        
-        extra_devices:
-          name: "Extra Devices to Turn Off"
-          description: Additional devices to turn off when automation ends (only used if Extra Turn Off is enabled)
-          default: []
-          selector:
-            entity:
-              multiple: true
-              filter:
-                - domain: light
-                - domain: switch
-                - domain: fan
-        
-        extra_off_scenes:
-          name: "Extra Scenes to Activate"
-          description: Additional scenes to activate when automation ends (only used if Extra Turn Off is enabled)
-          default: []
-          selector:
-            entity:
-              multiple: true
-              filter:
-                - domain: scene
-
 variables:
   binary_sensors: !input binary_sensors
   switches: !input switches
