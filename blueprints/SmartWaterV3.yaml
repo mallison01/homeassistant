@@ -387,21 +387,17 @@ trigger:
     entity_id: schedule.irrigation_schedule
     to: 'on'
     id: auto_schedule_helper
-  - platform: state
-    entity_id: !input manual_zone1_select
-    to: 'Start'
+  - platform: template
+    value_template: "{{ states(manual_zone1) == 'Start' if manual_zone1 != '' else false }}"
     id: manual_zone1
-  - platform: state
-    entity_id: !input manual_zone2_select
-    to: 'Start'
+  - platform: template
+    value_template: "{{ states(manual_zone2) == 'Start' if (enable_zone2 and manual_zone2 != '') else false }}"
     id: manual_zone2
-  - platform: state
-    entity_id: !input manual_zone3_select
-    to: 'Start'
+  - platform: template
+    value_template: "{{ states(manual_zone3) == 'Start' if (enable_zone3 and manual_zone3 != '') else false }}"
     id: manual_zone3
-  - platform: state
-    entity_id: !input manual_zone4_select
-    to: 'Start'
+  - platform: template
+    value_template: "{{ states(manual_zone4) == 'Start' if (enable_zone4 and manual_zone4 != '') else false }}"
     id: manual_zone4
 
 variables:
@@ -523,38 +519,38 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone1' }}"
+                    value_template: "{{ trigger.id == 'manual_zone1' and manual_zone1 != '' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
-                      entity_id: !input manual_zone1_select
+                      entity_id: "{{ manual_zone1 }}"
                     data:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone2' }}"
+                    value_template: "{{ trigger.id == 'manual_zone2' and enable_zone2 and manual_zone2 != '' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
-                      entity_id: !input manual_zone2_select
+                      entity_id: "{{ manual_zone2 }}"
                     data:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone3' }}"
+                    value_template: "{{ trigger.id == 'manual_zone3' and enable_zone3 and manual_zone3 != '' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
-                      entity_id: !input manual_zone3_select
+                      entity_id: "{{ manual_zone3 }}"
                     data:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone4' }}"
+                    value_template: "{{ trigger.id == 'manual_zone4' and enable_zone4 and manual_zone4 != '' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
-                      entity_id: !input manual_zone4_select
+                      entity_id: "{{ manual_zone4 }}"
                     data:
                       option: "Stop"
 
