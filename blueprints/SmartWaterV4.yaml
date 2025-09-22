@@ -63,7 +63,7 @@ blueprint:
           manual_zone2_select:
             name: 🌿 Manual Zone 2 Control (Input Select)
             description: "Input select entity for manual Zone 2 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 2 watering."
-            default: ""
+            default: "input_select.dummy"
             selector:
               entity:
                 domain: input_select
@@ -98,7 +98,7 @@ blueprint:
           manual_zone3_select:
             name: 🌿 Manual Zone 3 Control (Input Select)
             description: "Input select entity for manual Zone 3 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 3 watering."
-            default: ""
+            default: "input_select.dummy"
             selector:
               entity:
                 domain: input_select
@@ -133,7 +133,7 @@ blueprint:
           manual_zone4_select:
             name: 🌿 Manual Zone 4 Control (Input Select)
             description: "Input select entity for manual Zone 4 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 4 watering."
-            default: ""
+            default: "input_select.dummy"
             selector:
               entity:
                 domain: input_select
@@ -437,25 +437,32 @@ variables:
 condition:
   - condition: or
     conditions:
-      # Check if triggered schedule type is enabled
-      - condition: template
-        value_template: "{{ trigger.id in schedule_types }}"
-      # Manual override triggers
-      - condition: template
-        value_template: "{{ trigger.id == 'manual_zone1' }}"
-      - condition: template
-        value_template: "{{ trigger.id == 'manual_zone2' and enable_zone2 }}"
-      - condition: template
-        value_template: "{{ trigger.id == 'manual_zone3' and enable_zone3 }}"
-      - condition: template
-        value_template: "{{ trigger.id == 'manual_zone4' and enable_zone4 }}"
-      # Auto-created schedule helper (if enabled)
+      # Scheduled triggers (time-based)
       - condition: and
         conditions:
           - condition: template
-            value_template: "{{ trigger.id == 'auto_schedule_helper' }}"
+            value_template: "{{ trigger.id in schedule_types }}"
           - condition: template
-            value_template: "{{ create_schedule and 'schedule_helper' in schedule_types }}"
+            value_template: "{{ trigger.id != 'manual_check' }}"
+      # Manual control check (runs every minute)
+      - condition: and
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.id == 'manual_check' }}"
+          - condition: or
+            conditions:
+              - condition: template
+                value_template: "{{ manual_zone1 != '' and states(manual_zone1) == 'Start' }}"
+              - condition: template
+                value_template: "{{ enable_zone2 and manual_zone2 != '' and states(manual_zone2) == 'Start' }}"
+              - condition: template
+                value_template: "{{ enable_zone3 and manual_zone3 != '' and states(manual_zone3) == 'Start' }}"
+              - condition: template
+                value_template: "{{ enable_zone4 and manual_zone4 != '' and states(manual_zone4) == 'Start' }}"
+              - condition: template
+                value_template: "{{ create_schedule and states('schedule.irrigation_schedule') == 'on' }}"
+              - condition: template
+                value_template: "{{ schedule_helper_entity != '' and states(schedule_helper_entity) == 'on' }}"
 
 action:
   # Create schedule helper if requested
@@ -519,7 +526,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone1' and manual_zone1 != '' }}"
+                    value_template: "{{ trigger.id == 'manual_check' and manual_zone1 != '' and states(manual_zone1) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -528,7 +535,7 @@ action:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone2' and enable_zone2 and manual_zone2 != '' }}"
+                    value_template: "{{ trigger.id == 'manual_check' and enable_zone2 and manual_zone2 != '' and states(manual_zone2) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -537,7 +544,7 @@ action:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone3' and enable_zone3 and manual_zone3 != '' }}"
+                    value_template: "{{ trigger.id == 'manual_check' and enable_zone3 and manual_zone3 != '' and states(manual_zone3) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -546,7 +553,7 @@ action:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_zone4' and enable_zone4 and manual_zone4 != '' }}"
+                    value_template: "{{ trigger.id == 'manual_check' and enable_zone4 and manual_zone4 != '' and states(manual_zone4) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
