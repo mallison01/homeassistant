@@ -75,12 +75,11 @@ blueprint:
               boolean: {}
 
           manual_zone2_select:
-            name: 🌿 Manual Zone 2 Control (Input Select)
-            description: "Input select entity for manual Zone 2 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 2 watering."
-            default: "input_select.manual_zone2_control"
+            name: 🌿 Manual Zone 2 Control (Entity ID)
+            description: "Entity ID for manual Zone 2 control input_select. Should have options like 'Stop' and 'Start'."
+            default: ""
             selector:
-              entity:
-                domain: input_select
+              text: {}
 
           manual_zone2_duration:
             name: 🌿 Manual Zone 2 Duration (Minutes, 0 = automatic)
@@ -117,12 +116,11 @@ blueprint:
               boolean: {}
 
           manual_zone3_select:
-            name: 🌿 Manual Zone 3 Control (Input Select)
-            description: "Input select entity for manual Zone 3 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 3 watering."
-            default: "input_select.manual_zone3_control"
+            name: 🌿 Manual Zone 3 Control (Entity ID)
+            description: "Entity ID for manual Zone 3 control input_select. Should have options like 'Stop' and 'Start'."
+            default: ""
             selector:
-              entity:
-                domain: input_select
+              text: {}
 
           manual_zone3_duration:
             name: 🌿 Manual Zone 3 Duration (Minutes, 0 = automatic)
@@ -159,12 +157,11 @@ blueprint:
               boolean: {}
 
           manual_zone4_select:
-            name: 🌿 Manual Zone 4 Control (Input Select)
-            description: "Input select entity for manual Zone 4 control. Should have options like 'Stop' and 'Start' to allow manual activation of Zone 4 watering."
-            default: "input_select.manual_zone4_control"
+            name: 🌿 Manual Zone 4 Control (Entity ID)
+            description: "Entity ID for manual Zone 4 control input_select. Should have options like 'Stop' and 'Start'."
+            default: ""
             selector:
-              entity:
-                domain: input_select
+              text: {}
 
           manual_zone4_duration:
             name: 🌿 Manual Zone 4 Duration (Minutes, 0 = automatic)
@@ -286,12 +283,11 @@ blueprint:
               boolean: {}
 
           existing_schedule_helper:
-            name: 📅 Existing Schedule Helper
-            description: "Select an existing schedule helper entity. If 'Create Schedule Helper' is enabled above, you can leave this empty and use the auto-created one."
-            default: "schedule.irrigation_schedule"
+            name: 📅 Existing Schedule Helper (Entity ID)
+            description: "Entity ID of existing schedule helper entity."
+            default: ""
             selector:
-              entity:
-                domain: schedule
+              text: {}
 
     weather_soil:
         name: 🌧️ Weather & Soil Monitoring
@@ -306,12 +302,11 @@ blueprint:
               boolean: {}
 
           soil_moisture_sensor:
-            name: 💧 Soil Moisture Sensor
-            description: "Sensor that reports soil moisture as a percentage (0-100%). Watering will be skipped if moisture level is above the threshold."
-            default: "sensor.soil_moisture"
+            name: 💧 Soil Moisture Sensor (Entity ID)
+            description: "Entity ID of sensor that reports soil moisture percentage (0-100%)."
+            default: ""
             selector:
-              entity:
-                domain: sensor
+              text: {}
 
           soil_moisture_threshold:
             name: 💧 Soil Moisture Threshold (%)
@@ -330,12 +325,11 @@ blueprint:
               boolean: {}
 
           rain_amount_sensor:
-            name: 🌧️ Rain Amount Sensor
-            description: "Sensor that reports recent rainfall amount in inches. Used to skip watering when sufficient rain has occurred."
-            default: "sensor.rain_amount"
+            name: 🌧️ Rain Amount Sensor (Entity ID)
+            description: "Entity ID of sensor that reports rainfall amount in inches."
+            default: ""
             selector:
-              entity:
-                domain: sensor
+              text: {}
 
           rain_threshold:
             name: 🌧️ Rain Amount Threshold (inches)
@@ -354,12 +348,11 @@ blueprint:
               boolean: {}
 
           rain_live_sensor:
-            name: 🌧️ Rain Detection Sensor
-            description: "Binary sensor that detects active rain (on = rain detected, off = no rain). Watering will be immediately stopped if rain is detected."
-            default: "binary_sensor.rain_detected"
+            name: 🌧️ Rain Detection Sensor (Entity ID)
+            description: "Entity ID of binary sensor that detects active rain."
+            default: ""
             selector:
-              entity:
-                domain: binary_sensor
+              text: {}
 
     water_source_pump:
         name: 💧 Water Source & Pump Control
@@ -386,12 +379,11 @@ blueprint:
               boolean: {}
 
           water_level_sensor:
-            name: 🪣 Water Level Sensor
-            description: "Sensor that reports water tank level. Should report level in units matching your minimum water level setting."
-            default: "sensor.water_tank_level"
+            name: 🪣 Water Level Sensor (Entity ID)
+            description: "Entity ID of sensor that reports water tank level."
+            default: ""
             selector:
-              entity:
-                domain: sensor
+              text: {}
 
           min_water_level:
             name: 🪣 Minimum Water Level for Pump Activation
@@ -410,12 +402,11 @@ blueprint:
               boolean: {}
 
           pump:
-            name: ⚡ Pump Switch
-            description: "Switch entity that controls your irrigation pump. The pump will be activated before watering starts and turned off when complete."
-            default: "switch.irrigation_pump"
+            name: ⚡ Pump Switch (Entity ID)
+            description: "Entity ID of switch that controls irrigation pump."
+            default: ""
             selector:
-              entity:
-                domain: switch
+              text: {}
 
           pump_delay:
             name: ⚡ Pump Delay (Seconds)
