@@ -1,0 +1,480 @@
+
+blueprint:
+  name: Smart Irrigation Controller (Optional Helpers)
+  description: >
+    Flexible irrigation controller with 4 zones, schedule options, pump control,
+    rain/soil moisture checks, optional notifications, and optional tracking helpers.
+    All helpers are optional — you can create them in the UI or in YAML, and select
+    them here, or leave blank to disable tracking.
+  domain: automation
+  input:
+
+    #####################################
+    ## Zone configuration
+    #####################################
+    enable_zone1:
+      name: Enable Zone 1
+      default: true
+      selector:
+        boolean:
+    zone_1_name:
+      name: Zone 1 Name
+      default: "Zone 1"
+    zone_1_switch:
+      name: Zone 1 Switch
+      selector:
+        entity:
+          domain: switch
+    zone_1_duration:
+      name: Zone 1 Duration (minutes)
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: minutes
+          mode: slider
+
+    enable_zone2:
+      name: Enable Zone 2
+      default: true
+      selector:
+        boolean:
+    zone_2_name:
+      name: Zone 2 Name
+      default: "Zone 2"
+    zone_2_switch:
+      name: Zone 2 Switch
+      selector:
+        entity:
+          domain: switch
+    zone_2_duration:
+      name: Zone 2 Duration (minutes)
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: minutes
+          mode: slider
+
+    enable_zone3:
+      name: Enable Zone 3
+      default: true
+      selector:
+        boolean:
+    zone_3_name:
+      name: Zone 3 Name
+      default: "Zone 3"
+    zone_3_switch:
+      name: Zone 3 Switch
+      selector:
+        entity:
+          domain: switch
+    zone_3_duration:
+      name: Zone 3 Duration (minutes)
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: minutes
+          mode: slider
+
+    enable_zone4:
+      name: Enable Zone 4
+      default: true
+      selector:
+        boolean:
+    zone_4_name:
+      name: Zone 4 Name
+      default: "Zone 4"
+    zone_4_switch:
+      name: Zone 4 Switch
+      selector:
+        entity:
+          domain: switch
+    zone_4_duration:
+      name: Zone 4 Duration (minutes)
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          unit_of_measurement: minutes
+          mode: slider
+
+    #####################################
+    ## Optional Helpers (per zone)
+    #####################################
+    zone1_last_run:
+      name: Zone 1 Last Run (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+          multiple: false
+    zone1_last_duration:
+      name: Zone 1 Last Duration (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_number
+          multiple: false
+    zone1_last_status:
+      name: Zone 1 Last Status (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+          multiple: false
+
+    zone2_last_run:
+      name: Zone 2 Last Run (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+    zone2_last_duration:
+      name: Zone 2 Last Duration (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_number
+    zone2_last_status:
+      name: Zone 2 Last Status (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+
+    zone3_last_run:
+      name: Zone 3 Last Run (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+    zone3_last_duration:
+      name: Zone 3 Last Duration (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_number
+    zone3_last_status:
+      name: Zone 3 Last Status (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+
+    zone4_last_run:
+      name: Zone 4 Last Run (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+    zone4_last_duration:
+      name: Zone 4 Last Duration (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_number
+    zone4_last_status:
+      name: Zone 4 Last Status (optional)
+      default: ""
+      selector:
+        entity:
+          domain: input_text
+
+    #####################################
+    ## Pump configuration
+    #####################################
+    enable_pump:
+      name: Enable Pump
+      default: false
+      selector:
+        boolean:
+    pump_switch:
+      name: Pump Switch (optional)
+      default: ""
+      selector:
+        entity:
+          domain: switch
+    pump_delay:
+      name: Pump Startup Delay (seconds)
+      default: 5
+      selector:
+        number:
+          min: 0
+          max: 60
+          unit_of_measurement: seconds
+    enable_water_level:
+      name: Enable Water Level Check
+      default: false
+      selector:
+        boolean:
+    water_level_sensor:
+      name: Water Level Sensor (optional)
+      default: ""
+      selector:
+        entity:
+          domain: sensor
+    min_water_level:
+      name: Minimum Water Level
+      default: 20
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+
+    #####################################
+    ## Weather & Soil checks
+    #####################################
+    enable_rain_detection:
+      name: Enable Rain Detection
+      default: false
+      selector:
+        boolean:
+    rain_live_sensor:
+      name: Rain Live Sensor (optional)
+      default: ""
+      selector:
+        entity:
+          domain: binary_sensor
+    enable_rain_amount:
+      name: Enable Rainfall Accumulation
+      default: false
+      selector:
+        boolean:
+    rain_amount_sensor:
+      name: Rainfall Amount Sensor (optional)
+      default: ""
+      selector:
+        entity:
+          domain: sensor
+    rain_amount_threshold:
+      name: Rainfall Threshold (mm)
+      default: 5
+      selector:
+        number:
+          min: 0
+          max: 50
+          unit_of_measurement: mm
+    enable_soil_moisture:
+      name: Enable Soil Moisture
+      default: false
+      selector:
+        boolean:
+    soil_moisture_sensor:
+      name: Soil Moisture Sensor (optional)
+      default: ""
+      selector:
+        entity:
+          domain: sensor
+    soil_moisture_threshold:
+      name: Soil Moisture Threshold (%)
+      default: 30
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+
+    #####################################
+    ## Scheduling
+    #####################################
+    fixed_time1:
+      name: Fixed Schedule Time 1 (optional)
+      default: ""
+      selector:
+        time:
+    fixed_time2:
+      name: Fixed Schedule Time 2 (optional)
+      default: ""
+      selector:
+        time:
+    fixed_time3:
+      name: Fixed Schedule Time 3 (optional)
+      default: ""
+      selector:
+        time:
+    sunrise_offset:
+      name: Sunrise Offset (minutes)
+      default: 0
+      selector:
+        number:
+          min: -120
+          max: 120
+          unit_of_measurement: minutes
+    sunset_offset:
+      name: Sunset Offset (minutes)
+      default: 0
+      selector:
+        number:
+          min: -120
+          max: 120
+          unit_of_measurement: minutes
+    enable_schedule_helper:
+      name: Enable Schedule Helper
+      default: false
+      selector:
+        boolean:
+    schedule_helper_entity:
+      name: Schedule Helper Entity (optional)
+      default: ""
+      selector:
+        entity:
+
+    #####################################
+    ## Notifications (optional)
+    #####################################
+    notify_target:
+      name: Notify Target (optional)
+      default: ""
+      selector:
+        entity:
+          domain: notify
+    notify_title:
+      name: Notification Title
+      default: "Irrigation System"
+    notify_on_irrigation:
+      name: Notify on Start/Stop
+      default: true
+      selector:
+        boolean:
+    notify_on_summary:
+      name: Notify on Summary
+      default: true
+      selector:
+        boolean:
+
+    #####################################
+    ## Auto Reset
+    #####################################
+    enable_auto_reset:
+      name: Enable Auto Reset
+      default: false
+      selector:
+        boolean:
+    auto_reset_delay:
+      name: Auto Reset Delay (hours)
+      default: 24
+      selector:
+        number:
+          min: 1
+          max: 72
+          unit_of_measurement: hours
+
+trigger:
+  - platform: time
+    at: !input fixed_time1
+  - platform: time
+    at: !input fixed_time2
+  - platform: time
+    at: !input fixed_time3
+  - platform: sun
+    event: sunrise
+    offset: !input sunrise_offset
+  - platform: sun
+    event: sunset
+    offset: !input sunset_offset
+
+variables:
+  notify_target: !input notify_target
+
+action:
+  - variables:
+      zones:
+        - enabled: !input enable_zone1
+          name: !input zone_1_name
+          switch: !input zone_1_switch
+          duration: !input zone_1_duration
+          last_run: !input zone1_last_run
+          last_duration: !input zone1_last_duration
+          last_status: !input zone1_last_status
+        - enabled: !input enable_zone2
+          name: !input zone_2_name
+          switch: !input zone_2_switch
+          duration: !input zone_2_duration
+          last_run: !input zone2_last_run
+          last_duration: !input zone2_last_duration
+          last_status: !input zone2_last_status
+        - enabled: !input enable_zone3
+          name: !input zone_3_name
+          switch: !input zone_3_switch
+          duration: !input zone_3_duration
+          last_run: !input zone3_last_run
+          last_duration: !input zone3_last_duration
+          last_status: !input zone3_last_status
+        - enabled: !input enable_zone4
+          name: !input zone_4_name
+          switch: !input zone_4_switch
+          duration: !input zone_4_duration
+          last_run: !input zone4_last_run
+          last_duration: !input zone4_last_duration
+          last_status: !input zone4_last_status
+
+  - choose:
+      - conditions: "{{ is_state('!input enable_pump','on') and pump_switch != '' }}"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: !input pump_switch
+          - delay:
+              seconds: !input pump_delay
+
+  - repeat:
+      for_each: "{{ zones }}"
+      sequence:
+        - condition: template
+          value_template: "{{ repeat.item.enabled }}"
+        - service: switch.turn_on
+          target:
+            entity_id: "{{ repeat.item.switch }}"
+        - delay:
+            minutes: "{{ repeat.item.duration }}"
+        - service: switch.turn_off
+          target:
+            entity_id: "{{ repeat.item.switch }}"
+        - choose:
+            - conditions: "{{ repeat.item.last_run != '' }}"
+              sequence:
+                - service: input_text.set_value
+                  target:
+                    entity_id: "{{ repeat.item.last_run }}"
+                  data:
+                    value: "{{ now().isoformat() }}"
+            - conditions: "{{ repeat.item.last_duration != '' }}"
+              sequence:
+                - service: input_number.set_value
+                  target:
+                    entity_id: "{{ repeat.item.last_duration }}"
+                  data:
+                    value: "{{ repeat.item.duration }}"
+            - conditions: "{{ repeat.item.last_status != '' }}"
+              sequence:
+                - service: input_text.set_value
+                  target:
+                    entity_id: "{{ repeat.item.last_status }}"
+                  data:
+                    value: "Completed"
+
+  - choose:
+      - conditions: "{{ is_state('!input enable_pump','on') and pump_switch != '' }}"
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: !input pump_switch
+
+  - choose:
+      - conditions: "{{ notify_target != '' and !input notify_on_summary }}"
+        sequence:
+          - service: notify.send_message
+            target:
+              entity_id: !input notify_target
+            data:
+              title: !input notify_title
+              message: "Irrigation cycle completed."
+
+mode: restart
