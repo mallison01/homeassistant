@@ -1,0 +1,97 @@
+#################################################################
+# Irrigation helpers (helpers, totals, utility meters)
+# Save as config/packages/irrigation_helpers.yaml
+#################################################################
+
+homeassistant:
+  customize: {}
+
+input_text:
+  zone_1_last_run:
+    name: Zone 1 Last Run
+  zone_2_last_run:
+    name: Zone 2 Last Run
+  zone_3_last_run:
+    name: Zone 3 Last Run
+  zone_4_last_run:
+    name: Zone 4 Last Run
+
+  zone_1_last_status:
+    name: Zone 1 Last Status
+  zone_2_last_status:
+    name: Zone 2 Last Status
+  zone_3_last_status:
+    name: Zone 3 Last Status
+  zone_4_last_status:
+    name: Zone 4 Last Status
+
+  irrigation_debug_log:
+    name: Irrigation Debug Log
+    max: 255
+
+input_number:
+  zone_1_last_duration:
+    name: Zone 1 Last Duration (min)
+    min: 0
+    max: 999
+    step: 1
+  zone_2_last_duration:
+    name: Zone 2 Last Duration (min)
+    min: 0
+    max: 999
+    step: 1
+  zone_3_last_duration:
+    name: Zone 3 Last Duration (min)
+    min: 0
+    max: 999
+    step: 1
+  zone_4_last_duration:
+    name: Zone 4 Last Duration (min)
+    min: 0
+    max: 999
+    step: 1
+
+  zone_1_consumption:
+    name: Zone 1 Consumption (gal)
+    min: 0
+    max: 99999
+    step: 0.01
+  zone_2_consumption:
+    name: Zone 2 Consumption (gal)
+    min: 0
+    max: 99999
+    step: 0.01
+  zone_3_consumption:
+    name: Zone 3 Consumption (gal)
+    min: 0
+    max: 99999
+    step: 0.01
+  zone_4_consumption:
+    name: Zone 4 Consumption (gal)
+    min: 0
+    max: 99999
+    step: 0.01
+
+template:
+  - sensor:
+      - name: "Irrigation Total Consumption"
+        unique_id: irrigation_total_consumption
+        unit_of_measurement: "gal"
+        state: >
+          {{
+            (states('input_number.zone_1_consumption')|float(0)) +
+            (states('input_number.zone_2_consumption')|float(0)) +
+            (states('input_number.zone_3_consumption')|float(0)) +
+            (states('input_number.zone_4_consumption')|float(0))
+          }}
+
+utility_meter:
+  irrigation_daily:
+    source: sensor.irrigation_total_consumption
+    cycle: daily
+  irrigation_weekly:
+    source: sensor.irrigation_total_consumption
+    cycle: weekly
+  irrigation_monthly:
+    source: sensor.irrigation_total_consumption
+    cycle: monthly
