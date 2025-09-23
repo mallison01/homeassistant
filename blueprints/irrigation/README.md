@@ -1,164 +1,144 @@
-🌱 Advanced Multi-Zone Irrigation System
+🌱 Smart Multi-Zone Irrigation for Home Assistant
 
-Full-featured irrigation automation for Home Assistant.
-Supports 4 zones with schedules, sunrise/sunset offsets, early-abort sensors, consumption tracking, notifications, debug logging, and a ready-to-use dashboard.
+A complete smart irrigation system for Home Assistant with support for up to 4 independent irrigation zones, configurable schedules, pump control, soil and weather monitoring, water usage tracking, notifications, and per-zone abort logic.
+All components are modular, optional, and fully configurable via UI.
 
-📂 Files Included
+✨ Features
 
-Blueprint
-config/blueprints/automation/advanced_irrigation.yaml
-Main automation logic.
+✅ Up to 4 irrigation zones (switches/valves)
 
-Helpers + Sensors Package
-config/packages/irrigation_helpers.yaml
-Provides all required input_text, input_number, template, and utility_meter entities.
+✅ Fixed schedules (3 configurable times per day)
 
-Dashboard (optional)
-config/dashboards/irrigation_dashboard.yaml
-Lovelace dashboard with per-zone info, totals, and debug log.
+✅ Sun-based schedules (sunrise/sunset with offsets)
 
-README
-config/blueprints/automation/irrigation/README.md (this file)
+✅ Schedule Helper integration (optional advanced scheduling)
 
-⚙️ Installation
+✅ Manual overrides per zone (Start/Stop + custom duration)
 
-Enable packages in configuration.yaml (if not already):
+✅ Pump control with delay and water-level safety checks
+
+✅ Soil moisture, rainfall, and rain detection (optional abort conditions)
+
+✅ Per-zone early abort logic (stop zone if threshold not met)
+
+✅ Water usage calculation & daily/weekly/monthly meters
+
+✅ Persistent notifications for skip/abort/usage events
+
+✅ Debug logging toggle
+
+✅ Auto-reset toggle (reset manual selects after use)
+
+📂 Repository Structure
+/config
+├── blueprints/automation/irrigation/
+│   └── advanced_irrigation.yaml    # Main irrigation blueprint
+├── packages/
+│   └── irrigation_helpers.yaml     # Input_booleans, input_numbers, sensors, utility_meters
+├── dashboards/
+│   └── irrigation_dashboard.yaml   # Lovelace view (zones, totals, graphs)
+└── README.md                       # You are here
+
+🚀 Installation
+1. Copy Files
+
+Place the files in your Home Assistant config directory:
+
+advanced_irrigation.yaml → config/blueprints/automation/irrigation/
+
+irrigation_helpers.yaml → config/packages/
+
+irrigation_dashboard.yaml → config/dashboards/
+
+2. Enable Packages
+
+Add this to configuration.yaml if not already present:
 
 homeassistant:
-  packages: !include_dir_named packages
+  packages: !include_dir_merge_named packages
 
+3. Reload
 
-Copy files:
+Reload Automations
 
-Place helpers: config/packages/irrigation_helpers.yaml
+Reload Helpers
 
-Place blueprint: config/blueprints/automation/advanced_irrigation.yaml
+Or restart Home Assistant
 
-(Optional) dashboard: config/dashboards/irrigation_dashboard.yaml
+4. Import Dashboard
 
-Restart Home Assistant.
+Go to Settings → Dashboards → Add Dashboard
 
-🌐 Setup
+Open the Raw Config Editor and paste the contents of irrigation_dashboard.yaml
 
-Go to Settings → Automations & Scenes → Blueprints.
+⚙️ Setup
 
-Import from Advanced Multi-Zone Irrigation Controller.
+Create a new automation using the Advanced Irrigation blueprint
 
 Configure:
 
-Zone switches (4 max)
+Zones (valves/switches, runtimes, manual selects)
 
-Runtimes (per zone)
+Schedules (fixed, sun, or helper)
 
-Flow rates (per zone, gal/min)
+Optional: soil, rain, pump, level sensors
 
-Abort sensors (optional, per zone)
+Toggles: notifications, debug logging, auto-reset
 
-Schedules (fixed times, sunrise/sunset offsets, or helper entity)
+Save and enable
 
-Toggles: notifications + auto-reset
+✅ Validation Checklist
 
-📊 Dashboard
+ Confirm zones turn on/off correctly when manually triggered
 
-Add irrigation dashboard with Raw Config Editor → paste this snippet:
+ Confirm fixed schedule runs (set a near-future time for testing)
 
-views:
-  - title: Irrigation
-    path: irrigation
-    icon: mdi:sprinkler-variant
-    cards:
+ Confirm sun schedule (set offset to 0 and compare with actual sunrise/sunset)
 
-      - type: entities
-        title: Debug
-        entities:
-          - entity: input_text.irrigation_debug_log
+ Confirm schedule helper triggers irrigation when enabled
 
-      - type: entities
-        title: Zone 1
-        entities:
-          - input_text.zone_1_last_run
-          - input_text.zone_1_last_status
-          - input_number.zone_1_last_duration
-          - input_number.zone_1_consumption
+ Confirm pump activates with delay (if configured)
 
-      - type: entities
-        title: Zone 2
-        entities:
-          - input_text.zone_2_last_run
-          - input_text.zone_2_last_status
-          - input_number.zone_2_last_duration
-          - input_number.zone_2_consumption
+ Confirm soil/rain aborts stop watering when thresholds exceeded
 
-      - type: entities
-        title: Zone 3
-        entities:
-          - input_text.zone_3_last_run
-          - input_text.zone_3_last_status
-          - input_number.zone_3_last_duration
-          - input_number.zone_3_consumption
+ Confirm notifications appear in HA sidebar
 
-      - type: entities
-        title: Zone 4
-        entities:
-          - input_text.zone_4_last_run
-          - input_text.zone_4_last_status
-          - input_number.zone_4_last_duration
-          - input_number.zone_4_consumption
+ Confirm water usage values populate sensors and utility meters
 
-      - type: glance
-        title: Totals
-        entities:
-          - sensor.irrigation_total_consumption
-          - sensor.irrigation_daily
-          - sensor.irrigation_weekly
-          - sensor.irrigation_monthly
+ Confirm dashboard cards show current status and history
 
-✅ Features
+🛠️ Troubleshooting
 
-4 zones with independent runtimes & flow rates
+Error: Missing inputs
+→ Check that all required entities are assigned when creating the automation.
 
-Early-abort logic per zone (rain/soil sensors)
+Automation doesn’t trigger
+→ Verify schedule booleans are enabled in blueprint config.
 
-Schedules: fixed time, sunrise/sunset, or helper entity
+Zones not turning off
+→ Ensure each zone has valid switches/valves assigned.
 
-Auto-reset toggle per zone
+Water usage not showing
+→ Confirm you set a non-zero water_consumption_per_minute.
 
-Notifications toggle
+Abort not working
+→ Check that your soil/rain sensor reports values in the correct unit (%, in, mm).
 
-Per-zone last run, status, duration
+📊 Example Dashboard
 
-Per-zone + total consumption tracking (gal)
+💡 Optional: Add a screenshot here for GitHub
+Place your PNG/JPG in /docs/ and link it like this:
 
-Daily, weekly, monthly utility meters
+![Dashboard Preview](docs/dashboard_example.png)
 
-Debug log helper for troubleshooting
+🧩 Future Enhancements
 
-🧪 Validation Checklist
+MQTT integration for external controllers
 
- Helpers & sensors created
+Weather forecast-based watering prediction
 
- Automation created from blueprint
+HA companion app push notifications
 
- Zones run for configured duration
+📜 License
 
- Abort sensors skip zones when active
-
- Consumption sensors update correctly
-
- Utility meters increment
-
- Notifications send when enabled
-
- Debug log updates at each step
-
- Dashboard reflects all zone + total data
-
-🔧 Troubleshooting
-
-Check input_text.irrigation_debug_log for last debug message
-
-Verify helpers loaded (Developer Tools → States)
-
-If automation doesn’t trigger, confirm at least one schedule is enabled
-
-If consumption doesn’t increment, check zone flow rates are set correctly
+MIT License. Use freely and adapt for your system 🌍
