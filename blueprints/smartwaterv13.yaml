@@ -79,7 +79,8 @@ blueprint:
             description: "Entity ID for manual Zone 2 control input_select. Should have options like 'Stop' and 'Start'."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: input_select
 
           manual_zone2_duration:
             name: 🌿 Manual Zone 2 Duration (Minutes, 0 = automatic)
@@ -120,7 +121,8 @@ blueprint:
             description: "Entity ID for manual Zone 3 control input_select. Should have options like 'Stop' and 'Start'."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: input_select
 
           manual_zone3_duration:
             name: 🌿 Manual Zone 3 Duration (Minutes, 0 = automatic)
@@ -161,7 +163,8 @@ blueprint:
             description: "Entity ID for manual Zone 4 control input_select. Should have options like 'Stop' and 'Start'."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: input_select
 
           manual_zone4_duration:
             name: 🌿 Manual Zone 4 Duration (Minutes, 0 = automatic)
@@ -306,7 +309,8 @@ blueprint:
             description: "Entity ID of sensor that reports soil moisture percentage (0-100%)."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: sensor
 
           soil_moisture_threshold:
             name: 💧 Soil Moisture Threshold (%)
@@ -329,7 +333,8 @@ blueprint:
             description: "Entity ID of sensor that reports rainfall amount in inches."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: sensor
 
           rain_threshold:
             name: 🌧️ Rain Amount Threshold (inches)
@@ -352,7 +357,8 @@ blueprint:
             description: "Entity ID of binary sensor that detects active rain."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: sensor
 
     water_source_pump:
         name: 💧 Water Source & Pump Control
@@ -383,7 +389,8 @@ blueprint:
             description: "Entity ID of sensor that reports water tank level."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: sensor
 
           min_water_level:
             name: 🪣 Minimum Water Level for Pump Activation
@@ -406,7 +413,8 @@ blueprint:
             description: "Entity ID of switch that controls irrigation pump."
             default: ""
             selector:
-              text: {}
+              entity:
+                domain: switch
 
           pump_delay:
             name: ⚡ Pump Delay (Seconds)
