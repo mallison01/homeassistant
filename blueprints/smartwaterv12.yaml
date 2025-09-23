@@ -283,11 +283,11 @@ blueprint:
               boolean: {}
 
           existing_schedule_helper:
-            name: 📅 Existing Schedule Helper (Entity ID)
-            description: "Entity ID of existing schedule helper entity."
-            default: ""
+            name: 📅 Existing Schedule Helper
+            description: "Select an existing schedule helper entity."
             selector:
-              text: {}
+              entity:
+                domain: schedule
 
     weather_soil:
         name: 🌧️ Weather & Soil Monitoring
@@ -553,7 +553,7 @@ condition:
                   - condition: template
                     value_template: "{{ enable_manual_zone1 }}"
                   - condition: template
-                    value_template: "{{ manual_zone1 != '' }}"
+                    value_template: "{{ manual_zone1 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone1) == 'Start' }}"
               - condition: and
@@ -561,7 +561,7 @@ condition:
                   - condition: template
                     value_template: "{{ enable_zone2 and enable_manual_zone2 }}"
                   - condition: template
-                    value_template: "{{ manual_zone2 != '' }}"
+                    value_template: "{{ manual_zone2 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone2) == 'Start' }}"
               - condition: and
@@ -569,7 +569,7 @@ condition:
                   - condition: template
                     value_template: "{{ enable_zone3 and enable_manual_zone3 }}"
                   - condition: template
-                    value_template: "{{ manual_zone3 != '' }}"
+                    value_template: "{{ manual_zone3 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone3) == 'Start' }}"
               - condition: and
@@ -577,7 +577,7 @@ condition:
                   - condition: template
                     value_template: "{{ enable_zone4 and enable_manual_zone4 }}"
                   - condition: template
-                    value_template: "{{ manual_zone4 != '' }}"
+                    value_template: "{{ manual_zone4 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone4) == 'Start' }}"
               - condition: and
@@ -591,7 +591,7 @@ condition:
                   - condition: template
                     value_template: "{{ enable_schedule_helper and not create_schedule }}"
                   - condition: template
-                    value_template: "{{ existing_schedule_helper != '' }}"
+                    value_template: "{{ existing_schedule_helper is defined }}"
                   - condition: template
                     value_template: "{{ states(existing_schedule_helper) == 'on' }}"
 
@@ -616,7 +616,7 @@ action:
           - condition: template
             value_template: "{{ water_source == 'rainwater' }}"
           - condition: template
-            value_template: "{{ fill_sensor != '' }}"
+            value_template: "{{ fill_sensor is defined }}"
           - condition: template
             value_template: "{{ (states(fill_sensor) | float(0)) < min_level }}"
         sequence:
@@ -630,7 +630,7 @@ action:
           - condition: template
             value_template: "{{ enable_soil_moisture }}"
           - condition: template
-            value_template: "{{ soil_sensor != '' }}"
+            value_template: "{{ soil_sensor is defined }}"
           - condition: template
             value_template: "{{ (states(soil_sensor) | float(0)) > soil_threshold }}"
         sequence:
@@ -644,7 +644,7 @@ action:
           - condition: template
             value_template: "{{ enable_rain_amount }}"
           - condition: template
-            value_template: "{{ rain_sensor != '' }}"
+            value_template: "{{ rain_sensor is defined }}"
           - condition: template
             value_template: "{{ (states(rain_sensor) | float(0)) > rain_threshold }}"
         sequence:
@@ -658,7 +658,7 @@ action:
           - condition: template
             value_template: "{{ enable_rain_detection }}"
           - condition: template
-            value_template: "{{ rain_live_sensor != '' }}"
+            value_template: "{{ rain_live_sensor is defined }}"
           - condition: template
             value_template: "{{ is_state(rain_live_sensor, 'on') }}"
         sequence:
@@ -677,7 +677,7 @@ action:
                   - condition: template
                     value_template: "{{ enable_manual_zone1 }}"
                   - condition: template
-                    value_template: "{{ manual_zone1 != '' }}"
+                    value_template: "{{ manual_zone1 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone1) == 'Start' }}"
                 sequence:
@@ -692,7 +692,7 @@ action:
                   - condition: template
                     value_template: "{{ enable_zone2 and enable_manual_zone2 }}"
                   - condition: template
-                    value_template: "{{ manual_zone2 != '' }}"
+                    value_template: "{{ manual_zone2 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone2) == 'Start' }}"
                 sequence:
@@ -707,7 +707,7 @@ action:
                   - condition: template
                     value_template: "{{ enable_zone3 and enable_manual_zone3 }}"
                   - condition: template
-                    value_template: "{{ manual_zone3 != '' }}"
+                    value_template: "{{ manual_zone3 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone3) == 'Start' }}"
                 sequence:
@@ -722,7 +722,7 @@ action:
                   - condition: template
                     value_template: "{{ enable_zone4 and enable_manual_zone4 }}"
                   - condition: template
-                    value_template: "{{ manual_zone4 != '' }}"
+                    value_template: "{{ manual_zone4 is defined }}"
                   - condition: template
                     value_template: "{{ states(manual_zone4) == 'Start' }}"
                 sequence:
@@ -737,7 +737,7 @@ action:
               - condition: template
                 value_template: "{{ enable_pump }}"
               - condition: template
-                value_template: "{{ pump != '' }}"
+                value_template: "{{ pump is defined }}"
             then:
               - service: switch.turn_on
                 target:
@@ -832,7 +832,7 @@ action:
               - condition: template
                 value_template: "{{ enable_pump }}"
               - condition: template
-                value_template: "{{ pump != '' }}"
+                value_template: "{{ pump is defined }}"
             then:
               - service: switch.turn_off
                 target:
