@@ -526,7 +526,7 @@ variables:
 condition:
   - condition: or
     conditions:
-      # Fixed time schedules
+      # Fixed time schedules (only check if enabled)
       - condition: and
         conditions:
           - condition: template
@@ -540,7 +540,7 @@ condition:
           - condition: template
             value_template: "{{ trigger.id == 'fixed_time3' and enable_fixed_time3 }}"
       
-      # Sun-based schedules
+      # Sun-based schedules (only check if enabled)
       - condition: and
         conditions:
           - condition: template
@@ -550,25 +550,59 @@ condition:
           - condition: template
             value_template: "{{ trigger.id == 'sunset' and enable_sunset }}"
       
-      # Manual control checks
+      # Manual control checks (only when enabled AND entity exists)
       - condition: and
         conditions:
           - condition: template
             value_template: "{{ trigger.id == 'manual_check' }}"
           - condition: or
             conditions:
-              - condition: template
-                value_template: "{{ enable_manual_zone1 and manual_zone1 != '' and states(manual_zone1) == 'Start' }}"
-              - condition: template
-                value_template: "{{ enable_zone2 and enable_manual_zone2 and manual_zone2 != '' and states(manual_zone2) == 'Start' }}"
-              - condition: template
-                value_template: "{{ enable_zone3 and enable_manual_zone3 and manual_zone3 != '' and states(manual_zone3) == 'Start' }}"
-              - condition: template
-                value_template: "{{ enable_zone4 and enable_manual_zone4 and manual_zone4 != '' and states(manual_zone4) == 'Start' }}"
-              - condition: template
-                value_template: "{{ enable_schedule_helper and create_schedule and states('schedule.irrigation_schedule') == 'on' }}"
-              - condition: template
-                value_template: "{{ enable_schedule_helper and not create_schedule and existing_schedule_helper != '' and states(existing_schedule_helper) == 'on' }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_manual_zone1 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone1 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone1) == 'Start' }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_zone2 and enable_manual_zone2 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone2 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone2) == 'Start' }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_zone3 and enable_manual_zone3 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone3 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone3) == 'Start' }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_zone4 and enable_manual_zone4 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone4 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone4) == 'Start' }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_schedule_helper and create_schedule }}"
+                  - condition: template
+                    value_template: "{{ states('schedule.irrigation_schedule') == 'on' }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{{ enable_schedule_helper and not create_schedule }}"
+                  - condition: template
+                    value_template: "{{ existing_schedule_helper != '' }}"
+                  - condition: template
+                    value_template: "{{ states(existing_schedule_helper) == 'on' }}"
 
 action:
   # Create schedule helper if requested
@@ -584,46 +618,58 @@ action:
         continue_on_error: true
 
   - choose:
-      # Check water level if enabled
+      # Check water level (only if water level monitoring is enabled AND entity exists)
       - conditions:
           - condition: template
-            value_template: >
-              {{ enable_water_level and water_source == 'rainwater' and fill_sensor != '' and
-                 (states(fill_sensor) | float(0)) < min_level }}
+            value_template: "{{ enable_water_level }}"
+          - condition: template
+            value_template: "{{ water_source == 'rainwater' }}"
+          - condition: template
+            value_template: "{{ fill_sensor != '' }}"
+          - condition: template
+            value_template: "{{ (states(fill_sensor) | float(0)) < min_level }}"
         sequence:
           - service: persistent_notification.create
             data:
               title: Irrigation blocked
               message: Fill level too low for pump!
 
-      # Check soil moisture if enabled
+      # Check soil moisture (only if soil monitoring is enabled AND entity exists)
       - conditions:
           - condition: template
-            value_template: >
-              {{ enable_soil_moisture and soil_sensor != '' and
-                 (states(soil_sensor) | float(0)) > soil_threshold }}
+            value_template: "{{ enable_soil_moisture }}"
+          - condition: template
+            value_template: "{{ soil_sensor != '' }}"
+          - condition: template
+            value_template: "{{ (states(soil_sensor) | float(0)) > soil_threshold }}"
         sequence:
           - service: persistent_notification.create
             data:
               title: Irrigation not necessary
               message: Soil moisture above threshold.
 
-      # Check rain amount if enabled
+      # Check rain amount (only if rain amount monitoring is enabled AND entity exists)
       - conditions:
           - condition: template
-            value_template: >
-              {{ enable_rain_amount and rain_sensor != '' and (states(rain_sensor) | float(0)) > rain_threshold }}
+            value_template: "{{ enable_rain_amount }}"
+          - condition: template
+            value_template: "{{ rain_sensor != '' }}"
+          - condition: template
+            value_template: "{{ (states(rain_sensor) | float(0)) > rain_threshold }}"
         sequence:
           - service: persistent_notification.create
             data:
               title: Irrigation skipped
               message: Rain amount above threshold.
 
-      # Check live rain detection if enabled
+      # Check live rain detection (only if rain detection is enabled AND entity exists)
       - conditions:
           - condition: template
-            value_template: >
-              {{ enable_rain_detection and rain_live_sensor != '' and is_state(rain_live_sensor, 'on') }}
+            value_template: "{{ enable_rain_detection }}"
+          - condition: template
+            value_template: "{{ rain_live_sensor != '' }}"
+          - condition: template
+            value_template: "{{ is_state(rain_live_sensor, 'on') }}"
         sequence:
           - service: persistent_notification.create
             data:
@@ -632,11 +678,17 @@ action:
 
       - conditions: []
         sequence:
-          # Reset manual controls
+          # Reset manual controls (only if enabled AND entity exists AND in Start state)
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_check' and enable_manual_zone1 and manual_zone1 != '' and states(manual_zone1) == 'Start' }}"
+                    value_template: "{{ trigger.id == 'manual_check' }}"
+                  - condition: template
+                    value_template: "{{ enable_manual_zone1 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone1 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone1) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -645,7 +697,13 @@ action:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_check' and enable_zone2 and enable_manual_zone2 and manual_zone2 != '' and states(manual_zone2) == 'Start' }}"
+                    value_template: "{{ trigger.id == 'manual_check' }}"
+                  - condition: template
+                    value_template: "{{ enable_zone2 and enable_manual_zone2 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone2 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone2) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -654,7 +712,13 @@ action:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_check' and enable_zone3 and enable_manual_zone3 and manual_zone3 != '' and states(manual_zone3) == 'Start' }}"
+                    value_template: "{{ trigger.id == 'manual_check' }}"
+                  - condition: template
+                    value_template: "{{ enable_zone3 and enable_manual_zone3 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone3 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone3) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -663,7 +727,13 @@ action:
                       option: "Stop"
               - conditions:
                   - condition: template
-                    value_template: "{{ trigger.id == 'manual_check' and enable_zone4 and enable_manual_zone4 and manual_zone4 != '' and states(manual_zone4) == 'Start' }}"
+                    value_template: "{{ trigger.id == 'manual_check' }}"
+                  - condition: template
+                    value_template: "{{ enable_zone4 and enable_manual_zone4 }}"
+                  - condition: template
+                    value_template: "{{ manual_zone4 != '' }}"
+                  - condition: template
+                    value_template: "{{ states(manual_zone4) == 'Start' }}"
                 sequence:
                   - service: input_select.select_option
                     target:
@@ -671,10 +741,12 @@ action:
                     data:
                       option: "Stop"
 
-          # Start pump if enabled
+          # Start pump (only if pump control is enabled AND entity exists)
           - if:
               - condition: template
-                value_template: "{{ enable_pump and pump != '' }}"
+                value_template: "{{ enable_pump }}"
+              - condition: template
+                value_template: "{{ pump != '' }}"
             then:
               - service: switch.turn_on
                 target:
@@ -764,19 +836,23 @@ action:
                         target:
                           entity_id: "{{ zones_zone4 }}"
 
-          # Stop pump if enabled
+          # Stop pump (only if pump control is enabled AND entity exists)
           - if:
               - condition: template
-                value_template: "{{ enable_pump and pump != '' }}"
+                value_template: "{{ enable_pump }}"
+              - condition: template
+                value_template: "{{ pump != '' }}"
             then:
               - service: switch.turn_off
                 target:
                   entity_id: "{{ pump }}"
 
-          # Calculate and report water usage if enabled
+          # Calculate and report water usage (only if enabled AND rate is set)
           - if:
               - condition: template
-                value_template: "{{ enable_water_consumption and water_rate > 0 }}"
+                value_template: "{{ enable_water_consumption }}"
+              - condition: template
+                value_template: "{{ water_rate > 0 }}"
             then:
               - service: persistent_notification.create
                 data:
