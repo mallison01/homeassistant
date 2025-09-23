@@ -1,0 +1,1008 @@
+blueprint:
+  name: Advanced Multi-Zone Irrigation Controller (grouped, complete)
+  description: >
+    Full 4-zone irrigation blueprint with grouped inputs.
+    - 3 fixed times + sunrise/sunset + schedule helper (via poll)
+    - per-zone runtime, flow, last-run helpers, and early-abort
+    - pump support, tank/soil/rain checks, parallel/sequential modes
+    - per-zone water consumption (flow * minutes)
+    - debug log writes, per-zone & summary events, optional auto-reset
+  domain: automation
+
+  input:
+
+    #################################################################
+    # Zone configuration (collapsible group)
+    #################################################################
+    zone_config:
+      name: 🌿 Zone Configuration
+      collapsed: true
+      input:
+        # Zone 1 (always present)
+        zone_1_switch:
+          name: Zone 1 switch (valve/switch)
+          selector:
+            entity:
+              domain: switch
+        zone_1_name:
+          name: Zone 1 friendly name
+          default: Zone 1
+          selector:
+            text: {}
+        zone_1_duration:
+          name: Zone 1 runtime (minutes)
+          default: 10
+          selector:
+            number:
+              min: 1
+              max: 240
+              step: 1
+
+        # Zone 2 (optional)
+        enable_zone2:
+          name: Enable Zone 2
+          default: false
+          selector:
+            boolean: {}
+        zone_2_switch:
+          name: Zone 2 switch (valve/switch)
+          default: ""
+          selector:
+            entity:
+              domain: switch
+        zone_2_name:
+          name: Zone 2 friendly name
+          default: Zone 2
+          selector:
+            text: {}
+        zone_2_duration:
+          name: Zone 2 runtime (minutes)
+          default: 10
+          selector:
+            number:
+              min: 1
+              max: 240
+              step: 1
+
+        # Zone 3 (optional)
+        enable_zone3:
+          name: Enable Zone 3
+          default: false
+          selector:
+            boolean: {}
+        zone_3_switch:
+          name: Zone 3 switch (valve/switch)
+          default: ""
+          selector:
+            entity:
+              domain: switch
+        zone_3_name:
+          name: Zone 3 friendly name
+          default: Zone 3
+          selector:
+            text: {}
+        zone_3_duration:
+          name: Zone 3 runtime (minutes)
+          default: 10
+          selector:
+            number:
+              min: 1
+              max: 240
+              step: 1
+
+        # Zone 4 (optional)
+        enable_zone4:
+          name: Enable Zone 4
+          default: false
+          selector:
+            boolean: {}
+        zone_4_switch:
+          name: Zone 4 switch (valve/switch)
+          default: ""
+          selector:
+            entity:
+              domain: switch
+        zone_4_name:
+          name: Zone 4 friendly name
+          default: Zone 4
+          selector:
+            text: {}
+        zone_4_duration:
+          name: Zone 4 runtime (minutes)
+          default: 10
+          selector:
+            number:
+              min: 1
+              max: 240
+              step: 1
+
+    #################################################################
+    # Flow rates (collapsible)
+    #################################################################
+    flow_rates:
+      name: 💧 Flow Rates (gal/min)
+      collapsed: true
+      input:
+        zone_1_flow_rate:
+          name: Zone 1 flow rate (gal/min)
+          default: 1.0
+          selector:
+            number:
+              min: 0.01
+              max: 50
+              step: 0.01
+        zone_2_flow_rate:
+          name: Zone 2 flow rate (gal/min)
+          default: 1.0
+          selector:
+            number:
+              min: 0.01
+              max: 50
+              step: 0.01
+        zone_3_flow_rate:
+          name: Zone 3 flow rate (gal/min)
+          default: 1.0
+          selector:
+            number:
+              min: 0.01
+              max: 50
+              step: 0.01
+        zone_4_flow_rate:
+          name: Zone 4 flow rate (gal/min)
+          default: 1.0
+          selector:
+            number:
+              min: 0.01
+              max: 50
+              step: 0.01
+
+    #################################################################
+    # Manual controls (optional) - polled (collapsible)
+    #################################################################
+    manual_controls:
+      name: 🎛 Manual Controls
+      collapsed: true
+      input:
+        enable_manual_zone1:
+          name: Enable manual Zone 1 start
+          default: false
+          selector:
+            boolean: {}
+        manual_zone1_select:
+          name: Manual Zone 1 input_select entity (Start/Stop)
+          default: ""
+          selector:
+            entity:
+              domain: input_select
+
+        enable_manual_zone2:
+          name: Enable manual Zone 2 start
+          default: false
+          selector:
+            boolean: {}
+        manual_zone2_select:
+          name: Manual Zone 2 input_select entity (Start/Stop)
+          default: ""
+          selector:
+            entity:
+              domain: input_select
+
+        enable_manual_zone3:
+          name: Enable manual Zone 3 start
+          default: false
+          selector:
+            boolean: {}
+        manual_zone3_select:
+          name: Manual Zone 3 input_select entity (Start/Stop)
+          default: ""
+          selector:
+            entity:
+              domain: input_select
+
+        enable_manual_zone4:
+          name: Enable manual Zone 4 start
+          default: false
+          selector:
+            boolean: {}
+        manual_zone4_select:
+          name: Manual Zone 4 input_select entity (Start/Stop)
+          default: ""
+          selector:
+            entity:
+              domain: input_select
+
+    #################################################################
+    # Fixed time schedules (collapsible)
+    #################################################################
+    fixed_time_schedule:
+      name: ⏰ Fixed Time Schedules
+      collapsed: true
+      input:
+        enable_fixed_time1:
+          name: Enable Fixed Time 1
+          default: true
+          selector:
+            boolean: {}
+        fixed_time1:
+          name: Fixed Time 1 (HH:MM:SS)
+          default: "06:00:00"
+          selector:
+            time: {}
+
+        enable_fixed_time2:
+          name: Enable Fixed Time 2
+          default: false
+          selector:
+            boolean: {}
+        fixed_time2:
+          name: Fixed Time 2 (HH:MM:SS)
+          default: "12:00:00"
+          selector:
+            time: {}
+
+        enable_fixed_time3:
+          name: Enable Fixed Time 3
+          default: false
+          selector:
+            boolean: {}
+        fixed_time3:
+          name: Fixed Time 3 (HH:MM:SS)
+          default: "18:00:00"
+          selector:
+            time: {}
+
+    #################################################################
+    # Sun schedules (collapsible)
+    #################################################################
+    sun_schedule:
+      name: 🌅 Sun-Based Schedules
+      collapsed: true
+      input:
+        enable_sunrise:
+          name: Enable Sunrise Schedule
+          default: false
+          selector:
+            boolean: {}
+        sunrise_offset:
+          name: Sunrise Offset (e.g. -00:30:00)
+          default: "00:00:00"
+          selector:
+            text: {}
+        enable_sunset:
+          name: Enable Sunset Schedule
+          default: false
+          selector:
+            boolean: {}
+        sunset_offset:
+          name: Sunset Offset (e.g. +00:30:00)
+          default: "00:00:00"
+          selector:
+            text: {}
+
+    #################################################################
+    # Schedule helper (collapsible)
+    # (We detect this via the minute poll; safe if left empty)
+    #################################################################
+    schedule_helper:
+      name: 📅 Schedule Helper
+      collapsed: true
+      input:
+        enable_schedule_helper:
+          name: Use schedule helper
+          default: false
+          selector:
+            boolean: {}
+        schedule_helper_entity:
+          name: Schedule helper entity (input_boolean/input_select)
+          default: ""
+          selector:
+            entity: {}
+
+    #################################################################
+    # Weather, soil, rain, tank checks (collapsible)
+    #################################################################
+    weather_soil:
+      name: 🌧️ Weather & Soil Monitoring
+      collapsed: true
+      input:
+        enable_soil_moisture:
+          name: Enable soil moisture check
+          default: false
+          selector:
+            boolean: {}
+        soil_moisture_sensor:
+          name: Soil moisture sensor (0-100)
+          default: ""
+          selector:
+            entity:
+              domain: sensor
+        soil_moisture_threshold:
+          name: Soil moisture threshold (%) — skip if above
+          default: 30
+          selector:
+            number:
+              min: 0
+              max: 100
+              step: 1
+
+        enable_rain_amount:
+          name: Enable rain total check
+          default: false
+          selector:
+            boolean: {}
+        rain_amount_sensor:
+          name: Rain amount sensor
+          default: ""
+          selector:
+            entity:
+              domain: sensor
+        rain_amount_threshold:
+          name: Rain amount threshold (sensor units)
+          default: 0.4
+          selector:
+            number:
+              min: 0
+              max: 100
+              step: 0.01
+
+        enable_rain_detection:
+          name: Enable live rain detection
+          default: false
+          selector:
+            boolean: {}
+        rain_live_sensor:
+          name: Rain live binary_sensor
+          default: ""
+          selector:
+            entity:
+              domain: binary_sensor
+
+    #################################################################
+    # Water source & pump (collapsible)
+    #################################################################
+    water_source_pump:
+      name: 💧 Water Source & Pump Control
+      collapsed: true
+      input:
+        water_source:
+          name: Water source
+          default: tap_water
+          selector:
+            select:
+              options:
+                - label: Tap Water (unlimited)
+                  value: tap_water
+                - label: Rainwater / Cistern
+                  value: rainwater
+        enable_water_level:
+          name: Enable water level check (tank)
+          default: false
+          selector:
+            boolean: {}
+        water_level_sensor:
+          name: Water level sensor entity
+          default: ""
+          selector:
+            entity:
+              domain: sensor
+        min_water_level:
+          name: Minimum water level to run (units = sensor)
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 100000
+        enable_pump:
+          name: Enable pump control
+          default: false
+          selector:
+            boolean: {}
+        pump_switch:
+          name: Pump switch entity
+          default: ""
+          selector:
+            entity:
+              domain: switch
+        pump_delay:
+          name: Pump delay (seconds)
+          default: 5
+          selector:
+            number:
+              min: 0
+              max: 300
+
+    #################################################################
+    # Operation & consumption (collapsible)
+    #################################################################
+    operation:
+      name: ⚙️ Operation & Consumption
+      collapsed: true
+      input:
+        parallel_watering:
+          name: Parallel watering (all enabled zones at once)
+          default: false
+          selector:
+            boolean: {}
+        enable_water_consumption:
+          name: Enable water consumption tracking (writes helpers)
+          default: true
+          selector:
+            boolean: {}
+
+    #################################################################
+    # Notifications and auto-reset (collapsible)
+    #################################################################
+    notifications:
+      name: 🔔 Notifications & Auto-reset
+      collapsed: true
+      input:
+        notify_target:
+          name: Notification target (notify service)
+          default: ""
+          selector:
+            entity:
+              domain: notify
+        notify_on_irrigation:
+          name: Notify for start/zone abort/completion
+          default: true
+          selector:
+            boolean: {}
+        notify_on_summary:
+          name: Notify summary at end
+          default: true
+          selector:
+            boolean: {}
+        notify_include_utility_totals:
+          name: Include utility totals in summary
+          default: false
+          selector:
+            boolean: {}
+        notify_title:
+          name: Notification title
+          default: Irrigation
+          selector:
+            text: {}
+        notify_tag:
+          name: Notification tag
+          default: irrigation
+          selector:
+            text: {}
+        notify_sound:
+          name: Notification sound
+          default: default
+          selector:
+            text: {}
+
+    auto_reset:
+      name: 🔄 Auto-reset Settings
+      collapsed: true
+      input:
+        enable_auto_reset:
+          name: Enable auto-reset of schedule helper
+          default: false
+          selector:
+            boolean: {}
+        auto_reset_delay:
+          name: Auto-reset delay (seconds)
+          default: 30
+          selector:
+            number:
+              min: 0
+              max: 3600
+
+#########################################################################
+# TRIGGERS
+# - fixed times & sun triggers are explicit (they exist as inputs)
+# - manual starts & schedule helper are detected via minute poll trigger
+#########################################################################
+trigger:
+  - platform: time
+    at: !input zone_config.fixed_time1
+    id: fixed_time1
+  - platform: time
+    at: !input zone_config.fixed_time2
+    id: fixed_time2
+  - platform: time
+    at: !input zone_config.fixed_time3
+    id: fixed_time3
+  - platform: sun
+    event: sunrise
+    offset: !input sun_schedule.sunrise_offset
+    id: sunrise
+  - platform: sun
+    event: sunset
+    offset: !input sun_schedule.sunset_offset
+    id: sunset
+  - platform: time_pattern
+    minutes: '/1'
+    id: manual_check
+
+#########################################################################
+# VARIABLES (bring inputs into lists for looping)
+#########################################################################
+variables:
+  zone_switches:
+    - !input zone_config.zone_1_switch
+    - !input zone_config.zone_2_switch
+    - !input zone_config.zone_3_switch
+    - !input zone_config.zone_4_switch
+
+  zone_names:
+    - !input zone_config.zone_1_name
+    - !input zone_config.zone_2_name
+    - !input zone_config.zone_3_name
+    - !input zone_config.zone_4_name
+
+  zone_enabled_flags:
+    - true
+    - !input zone_config.enable_zone2
+    - !input zone_config.enable_zone3
+    - !input zone_config.enable_zone4
+
+  zone_durations:
+    - !input zone_config.zone_1_duration
+    - !input zone_config.zone_2_duration
+    - !input zone_config.zone_3_duration
+    - !input zone_config.zone_4_duration
+
+  zone_flows:
+    - !input flow_rates.zone_1_flow_rate
+    - !input flow_rates.zone_2_flow_rate
+    - !input flow_rates.zone_3_flow_rate
+    - !input flow_rates.zone_4_flow_rate
+
+  # manual selects / schedule helper (polled)
+  enable_manual_zone1: !input manual_controls.enable_manual_zone1
+  manual_zone1_select: !input manual_controls.manual_zone1_select
+  enable_manual_zone2: !input manual_controls.enable_manual_zone2
+  manual_zone2_select: !input manual_controls.manual_zone2_select
+  enable_manual_zone3: !input manual_controls.enable_manual_zone3
+  manual_zone3_select: !input manual_controls.manual_zone3_select
+  enable_manual_zone4: !input manual_controls.enable_manual_zone4
+  manual_zone4_select: !input manual_controls.manual_zone4_select
+
+  enable_schedule_helper: !input schedule_helper.enable_schedule_helper
+  schedule_helper_entity: !input schedule_helper.schedule_helper_entity
+
+  # weather/soil/rain/tank
+  enable_soil_moisture: !input weather_soil.enable_soil_moisture
+  soil_sensor: !input weather_soil.soil_moisture_sensor
+  soil_threshold: !input weather_soil.soil_moisture_threshold
+
+  enable_rain_amount: !input weather_soil.enable_rain_amount
+  rain_amount_sensor: !input weather_soil.rain_amount_sensor
+  rain_amount_threshold: !input weather_soil.rain_amount_threshold
+
+  enable_rain_detection: !input weather_soil.enable_rain_detection
+  rain_live_sensor: !input weather_soil.rain_live_sensor
+
+  water_source: !input water_source_pump.water_source
+  enable_water_level: !input water_source_pump.enable_water_level
+  water_level_sensor: !input water_source_pump.water_level_sensor
+  min_water_level: !input water_source_pump.min_water_level
+
+  enable_pump: !input water_source_pump.enable_pump
+  pump_switch: !input water_source_pump.pump_switch
+  pump_delay: !input water_source_pump.pump_delay
+
+  parallel: !input operation.parallel_watering
+  enable_consumption: !input operation.enable_water_consumption
+
+  notify_target: !input notifications.notify_target
+  notify_on_irrigation: !input notifications.notify_on_irrigation
+  notify_on_summary: !input notifications.notify_on_summary
+  notify_include_utility_totals: !input notifications.notify_include_utility_totals
+  notify_title: !input notifications.notify_title
+  notify_tag: !input notifications.notify_tag
+  notify_sound: !input notifications.notify_sound
+
+  enable_auto_reset: !input auto_reset.enable_auto_reset
+  auto_reset_delay: !input auto_reset.auto_reset_delay
+
+#########################################################################
+# ACTIONS
+#########################################################################
+action:
+  - variables:
+      # scratch values
+      irrigation_log: []
+      total_consumption: 0.0
+      run_start_time: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+  # write a debug start message (helper should exist in helpers package)
+  - service: input_text.set_value
+    data:
+      entity_id: input_text.irrigation_debug_log
+      value: "Irrigation start: {{ run_start_time }} (trigger={{ trigger.id }})"
+
+  # 1) Decide if this trigger should run (respect enabled schedule toggles OR manual starts)
+  - condition: or
+    conditions:
+      - condition: template
+        value_template: "{{ trigger.id == 'fixed_time1' and zone_config.enable_fixed_time1 if zone_config is defined else (enable_fixed_time1 if enable_fixed_time1 is defined else true) }}"
+      - condition: template
+        value_template: "{{ trigger.id == 'fixed_time2' and zone_config.enable_fixed_time2 if zone_config is defined else true }}"
+      - condition: template
+        value_template: "{{ trigger.id == 'fixed_time3' and zone_config.enable_fixed_time3 if zone_config is defined else true }}"
+      - condition: template
+        value_template: "{{ trigger.id == 'sunrise' and sun_schedule.enable_sunrise if sun_schedule is defined else enable_sunrise }}"
+      - condition: template
+        value_template: "{{ trigger.id == 'sunset' and sun_schedule.enable_sunset if sun_schedule is defined else enable_sunset }}"
+      - condition: template
+        value_template: >
+          {% if trigger.id == 'manual_check' %}
+            {{ (enable_manual_zone1 and manual_zone1_select != '' and states(manual_zone1_select) == 'Start') or
+               (enable_manual_zone2 and manual_zone2_select != '' and states(manual_zone2_select) == 'Start') or
+               (enable_manual_zone3 and manual_zone3_select != '' and states(manual_zone3_select) == 'Start') or
+               (enable_manual_zone4 and manual_zone4_select != '' and states(manual_zone4_select) == 'Start') or
+               (enable_schedule_helper and schedule_helper_entity != '' and is_state(schedule_helper_entity, 'on')) }}
+          {% else %}
+            false
+          {% endif %}
+
+  # 2) Pre-run checks: water level, soil moisture, rain
+  - variables:
+      skip_reason: ""
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ enable_water_level and water_source == 'rainwater' and water_level_sensor != '' and (states(water_level_sensor) | float(0)) < min_water_level }}
+        sequence:
+          - variables:
+              skip_reason: "Water level below minimum"
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ enable_soil_moisture and soil_sensor != '' and (states(soil_sensor) | float(0)) > soil_threshold }}
+        sequence:
+          - variables:
+              skip_reason: "Soil moisture above threshold"
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ enable_rain_amount and rain_amount_sensor != '' and (states(rain_amount_sensor) | float(0)) > rain_amount_threshold }}
+        sequence:
+          - variables:
+              skip_reason: "Recent rain above threshold"
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ enable_rain_detection and rain_live_sensor != '' and is_state(rain_live_sensor, 'on') }}
+        sequence:
+          - variables:
+              skip_reason: "Live rain detected"
+
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ skip_reason != '' }}"
+        sequence:
+          - service: input_text.set_value
+            data:
+              entity_id: input_text.irrigation_debug_log
+              value: "Irrigation skipped: {{ skip_reason }} at {{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+          - if: "{{ notify_on_irrigation }}"
+            then:
+              - service: notify.notify
+                data:
+                  target: "{{ notify_target }}"
+                  title: "{{ notify_title }}"
+                  message: "Irrigation skipped: {{ skip_reason }} (trigger={{ trigger.id }})"
+                  data:
+                    tag: "{{ notify_tag }}"
+                    sound: "{{ notify_sound }}"
+          - stop: "Pre-check blocked irrigation"
+
+  # 3) Start pump if enabled & available
+  - if:
+      - condition: template
+        value_template: "{{ enable_pump and pump_switch != '' }}"
+    then:
+      - service: switch.turn_on
+        target:
+          entity_id: "{{ pump_switch }}"
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.irrigation_debug_log
+          value: "Pump started at {{ now().strftime('%H:%M:%S') }}"
+      - delay:
+          seconds: "{{ pump_delay }}"
+
+  # 4) Notify run start
+  - if: "{{ notify_on_irrigation }}"
+    then:
+      - service: notify.notify
+        data:
+          target: "{{ notify_target }}"
+          title: "{{ notify_title }}"
+          message: "Irrigation started (trigger={{ trigger.id }})"
+          data:
+            tag: "{{ notify_tag }}"
+            sound: "{{ notify_sound }}"
+
+  # 5) Execute watering (parallel or sequential)
+  - variables:
+      total_consumption: 0.0
+  - choose:
+
+    #################################################################
+    # PARALLEL MODE
+    #################################################################
+    - conditions:
+        - condition: template
+          value_template: "{{ parallel }}"
+      sequence:
+        - variables:
+            enabled_indices: >
+              {{ [i for i in range(0,4) if zone_enabled_flags[i] and zone_switches[i] != ''] }}
+            selected_switches: >
+              {{ [ zone_switches[i] for i in enabled_indices ] if enabled_indices|length>0 else [] }}
+            max_runtime: >
+              {{ ( [ zone_durations[i]|int for i in enabled_indices ] | max ) if enabled_indices|length>0 else 0 }}
+            poll_interval: 10
+            loops: "{{ (max_runtime * 60 / poll_interval) | int if max_runtime>0 else 0 }}"
+            start_ts: "{{ now().timestamp() }}"
+        - choose:
+            - conditions: "{{ selected_switches | length == 0 }}"
+              sequence:
+                - service: input_text.set_value
+                  data:
+                    entity_id: input_text.irrigation_debug_log
+                    value: "Parallel mode: no enabled zones ({{ now().strftime('%Y-%m-%d %H:%M:%S') }})"
+                - stop: "No zones to run"
+        - service: homeassistant.turn_on
+          target:
+            entity_id: "{{ selected_switches }}"
+        - repeat:
+            count: "{{ loops if loops>0 else 1 }}"
+            sequence:
+              - choose:
+                  - conditions:
+                      - condition: template
+                        value_template: >
+                          {{ (enable_rain_detection and rain_live_sensor != '' and is_state(rain_live_sensor,'on')) or
+                             (enable_water_level and water_level_sensor != '' and (states(water_level_sensor)|float(0)) < min_water_level) or
+                             (enable_soil_moisture and soil_sensor != '' and (states(soil_sensor)|float(0)) > soil_threshold)
+                          }}
+                    sequence:
+                      - service: input_text.set_value
+                        data:
+                          entity_id: input_text.irrigation_debug_log
+                          value: "Parallel abort detected at {{ now().strftime('%H:%M:%S') }}"
+                      - stop: "Parallel abort"
+              - delay:
+                  seconds: "{{ poll_interval }}"
+        - variables:
+            end_ts: "{{ now().timestamp() }}"
+            elapsed_min: "{{ ((end_ts - start_ts) / 60) | float(0) }}"
+            aborted_now: >
+              {{ (enable_rain_detection and rain_live_sensor != '' and is_state(rain_live_sensor,'on')) or
+                 (enable_water_level and water_level_sensor != '' and (states(water_level_sensor)|float(0)) < min_water_level) or
+                 (enable_soil_moisture and soil_sensor != '' and (states(soil_sensor)|float(0)) > soil_threshold)
+              }}
+            per_zone_runtime_list: >
+              {{ [
+                (elapsed_min if aborted_now else zone_durations[0]) if zone_enabled_flags[0] else 0,
+                (elapsed_min if aborted_now else zone_durations[1]) if zone_enabled_flags[1] else 0,
+                (elapsed_min if aborted_now else zone_durations[2]) if zone_enabled_flags[2] else 0,
+                (elapsed_min if aborted_now else zone_durations[3]) if zone_enabled_flags[3] else 0
+              ] }}
+            per_zone_consumption_list: >
+              {{ per_zone_runtime_list | zip(zone_flows) | map(lambda p: (p[0]|float(0)) * (p[1]|float(0))) | list }}
+            total_consumption: "{{ per_zone_consumption_list | sum }}"
+        - service: homeassistant.turn_off
+          target:
+            entity_id: "{{ selected_switches }}"
+        - repeat:
+            count: 4
+            sequence:
+              - variables:
+                  idx: "{{ repeat.index - 1 }}"
+                  enabled: "{{ zone_enabled_flags[idx] }}"
+                  runtime_used: "{{ per_zone_runtime_list[idx] | float(0) }}"
+                  consumption_used: "{{ per_zone_consumption_list[idx] | float(0) }}"
+                  zname: "{{ zone_names[idx] }}"
+              - if: "{{ enabled }}"
+                then:
+                  - service: input_text.set_value
+                    data:
+                      entity_id: "input_text.zone_{{ repeat.index }}_last_run"
+                      value: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                  - service: input_number.set_value
+                    data:
+                      entity_id: "input_number.zone_{{ repeat.index }}_last_duration"
+                      value: "{{ runtime_used | round(1) }}"
+                  - service: input_number.set_value
+                    data:
+                      entity_id: "input_number.zone_{{ repeat.index }}_consumption"
+                      value: "{{ consumption_used | round(2) }}"
+                  - service: input_text.set_value
+                    data:
+                      entity_id: "input_text.zone_{{ repeat.index }}_last_status"
+                      value: "{% if aborted_now %}Aborted{% else %}Completed{% endif %}"
+                  - event: irrigation_zone_completed
+                    event_data:
+                      zone: "{{ zname }}"
+                      duration: "{{ runtime_used | round(1) }}"
+                      aborted: "{{ aborted_now }}"
+                      water_used: "{{ consumption_used | round(2) }}"
+                  - service: input_text.set_value
+                    data:
+                      entity_id: input_text.irrigation_debug_log
+                      value: "Parallel: zone {{ repeat.index }} {{ 'aborted' if aborted_now else 'completed' }} ({{ runtime_used|round(1) }} min)"
+
+    #################################################################
+    # SEQUENTIAL MODE
+    #################################################################
+    - conditions: []
+      sequence:
+        - repeat:
+            count: 4
+            sequence:
+              - variables:
+                  idx: "{{ repeat.index - 1 }}"
+                  enabled: "{{ zone_enabled_flags[idx] }}"
+                  zswitch: "{{ zone_switches[idx] }}"
+                  zname: "{{ zone_names[idx] }}"
+                  zduration: "{{ zone_durations[idx] | int }}"
+                  zflow: "{{ zone_flows[idx] | float }}"
+              - if: "{{ enabled and zswitch != '' }}"
+                then:
+                  - service: input_text.set_value
+                    data:
+                      entity_id: input_text.irrigation_debug_log
+                      value: "Sequential: starting zone {{ idx+1 }} ({{ zname }}) at {{ now().strftime('%H:%M:%S') }}"
+                  - service: notify.notify
+                    data:
+                      target: "{{ notify_target }}"
+                      title: "{{ notify_title }}"
+                      message: "Starting zone: {{ zname }} ({{ zduration }} min)"
+                      data:
+                        tag: "{{ notify_tag }}"
+                        sound: "{{ notify_sound }}"
+                  - service: switch.turn_on
+                    target:
+                      entity_id: "{{ zswitch }}"
+                  - variables:
+                      poll_interval: 10
+                      loops: "{{ (zduration * 60 / poll_interval) | int if zduration>0 else 0 }}"
+                      start_ts: "{{ now().timestamp() }}"
+                  - repeat:
+                      count: "{{ loops if loops>0 else 1 }}"
+                      sequence:
+                        - choose:
+                            - conditions:
+                                - condition: template
+                                  value_template: >
+                                    {{ (enable_rain_detection and rain_live_sensor != '' and is_state(rain_live_sensor,'on')) or
+                                       (enable_water_level and water_level_sensor != '' and (states(water_level_sensor)|float(0)) < min_water_level) or
+                                       (enable_soil_moisture and soil_sensor != '' and (states(soil_sensor)|float(0)) > soil_threshold)
+                                    }}
+                              sequence:
+                                - service: input_text.set_value
+                                  data:
+                                    entity_id: input_text.irrigation_debug_log
+                                    value: "Sequential: zone {{ idx+1 }} aborted at {{ now().strftime('%H:%M:%S') }}"
+                                - stop: "Zone aborted"
+                        - delay:
+                            seconds: "{{ poll_interval }}"
+                  - variables:
+                      end_ts: "{{ now().timestamp() }}"
+                      elapsed_min: "{{ ((end_ts - start_ts) / 60) | float(0) }}"
+                      aborted: >
+                        {{ (enable_rain_detection and rain_live_sensor != '' and is_state(rain_live_sensor,'on')) or
+                           (enable_water_level and water_level_sensor != '' and (states(water_level_sensor)|float(0)) < min_water_level) or
+                           (enable_soil_moisture and soil_sensor != '' and (states(soil_sensor)|float(0)) > soil_threshold)
+                        }}
+                      runtime_used: "{{ elapsed_min if aborted else zduration }}"
+                      consumption: "{{ (runtime_used | float(0)) * (zflow | float(0)) if enable_consumption else 0 }}"
+                  - service: switch.turn_off
+                    target:
+                      entity_id: "{{ zswitch }}"
+                  - service: input_text.set_value
+                    data:
+                      entity_id: "input_text.zone_{{ idx+1 }}_last_run"
+                      value: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                  - service: input_number.set_value
+                    data:
+                      entity_id: "input_number.zone_{{ idx+1 }}_last_duration"
+                      value: "{{ runtime_used | round(1) }}"
+                  - service: input_number.set_value
+                    data:
+                      entity_id: "input_number.zone_{{ idx+1 }}_consumption"
+                      value: "{{ consumption | round(2) }}"
+                  - service: input_text.set_value
+                    data:
+                      entity_id: "input_text.zone_{{ idx+1 }}_last_status"
+                      value: "{% if aborted %}Aborted{% else %}Completed{% endif %}"
+                  - event: irrigation_zone_completed
+                    event_data:
+                      zone: "{{ zname }}"
+                      duration: "{{ runtime_used | round(1) }}"
+                      aborted: "{{ aborted }}"
+                      water_used: "{{ consumption | round(2) }}"
+                  - service: input_text.set_value
+                    data:
+                      entity_id: input_text.irrigation_debug_log
+                      value: "Sequential: zone {{ idx+1 }} {{ 'aborted' if aborted else 'completed' }} ({{ runtime_used|round(1) }} min)"
+                  - variables:
+                      total_consumption: "{{ total_consumption + (consumption | float(0)) }}"
+                  - if: "{{ aborted }}"
+                    then:
+                      - if: "{{ notify_on_irrigation }}"
+                        then:
+                          - service: notify.notify
+                            data:
+                              target: "{{ notify_target }}"
+                              title: "{{ notify_title }}"
+                              message: "Zone aborted: {{ zname }} (trigger={{ trigger.id }})"
+                              data:
+                                tag: "{{ notify_tag }}"
+                                sound: "{{ notify_sound }}"
+
+  # 6) Stop pump if used
+  - if:
+      - condition: template
+        value_template: "{{ enable_pump and pump_switch != '' }}"
+    then:
+      - service: switch.turn_off
+        target:
+          entity_id: "{{ pump_switch }}"
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.irrigation_debug_log
+          value: "Pump stopped at {{ now().strftime('%H:%M:%S') }}"
+
+  # 7) Summary notification & event
+  - variables:
+      summary_log: >
+        {% for i in range(1,5) %}
+        • Zone {{ i }} — {{ (states('input_text.zone_' ~ i ~ '_last_run') or 'NA') }} — {{ states('input_text.zone_' ~ i ~ '_last_status') or 'NA' }} — {{ states('input_number.zone_' ~ i ~ '_last_duration') }} min — {{ states('input_number.zone_' ~ i ~ '_consumption') }} gal
+        {% endfor %}
+  - if: "{{ notify_on_summary }}"
+    then:
+      - service: notify.notify
+        data:
+          target: "{{ notify_target }}"
+          title: "{{ notify_title }} — Summary ({{ trigger.id }})"
+          message: >
+            🌱 Irrigation summary (trigger: {{ trigger.id }}):
+
+            {{ summary_log }}
+
+            {% if enable_consumption %}
+            💧 Total used (approx): {{ total_consumption | round(2) }} gal
+            {% endif %}
+
+            {% if notify_include_utility_totals %}
+            📊 Daily: {{ states('sensor.irrigation_daily') }} gal
+            📊 Weekly: {{ states('sensor.irrigation_weekly') }} gal
+            📊 Monthly: {{ states('sensor.irrigation_monthly') }} gal
+            {% endif %}
+          data:
+            tag: "{{ notify_tag }}"
+            sound: "{{ notify_sound }}"
+
+  - event: irrigation_summary_completed
+    event_data:
+      schedule: "{{ trigger.id }}"
+      log: "{{ summary_log }}"
+      total_consumption: "{{ total_consumption | round(2) }}"
+
+  # 8) Auto-reset schedule helper (if used & requested)
+  - if:
+      - condition: template
+        value_template: "{{ enable_auto_reset and (schedule_helper_entity != '') }}"
+    then:
+      - delay:
+          seconds: "{{ auto_reset_delay }}"
+      - service: homeassistant.turn_off
+        target:
+          entity_id: "{{ schedule_helper_entity }}"
+
+  # final debug write
+  - service: input_text.set_value
+    data:
+      entity_id: input_text.irrigation_debug_log
+      value: "Irrigation finished at {{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
