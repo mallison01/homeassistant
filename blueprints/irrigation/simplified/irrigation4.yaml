@@ -1,3 +1,4 @@
+
 blueprint:
   name: Advanced Smart Irrigation — 4 Zones (Optional Helpers)
   description: >
@@ -513,6 +514,11 @@ blueprint:
       name: Monthly irrigation meter (optional)
       default: ""
       selector:
+          domain: utility_meter
+    irrigation_monthly_meter:
+      name: Monthly irrigation meter (optional)
+      default: ""
+      selector:
         entity:
           domain: utility_meter
 
@@ -651,23 +657,29 @@ action:
   - variables:
       now_ts: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
       trigger_id: "{{ trigger.id }}"
+  # Expose schedule enable inputs as variables (so we can reference them inside templates safely)
+  - variables:
+      schedule_fixed1_enabled: !input fixed_time1_enable
+      schedule_fixed2_enabled: !input fixed_time2_enable
+      schedule_fixed3_enabled: !input fixed_time3_enable
+      schedule_sunrise_enabled: !input sunrise_enable
+      schedule_sunset_enabled: !input sunset_enable
   # Determine if this trigger should run based on enabled toggles
   - choose:
       - conditions:
           - condition: template
             value_template: >
               {% if trigger.id == 'fixed_time1' %}
-                {{ true if (is_state('binary_sensor.always_on','on') or true) else false }}
+                {{ schedule_fixed1_enabled }}
               {% elif trigger.id == 'fixed_time2' %}
-                {{ true }}
+                {{ schedule_fixed2_enabled }}
               {% elif trigger.id == 'fixed_time3' %}
-                {{ true }}
+                {{ schedule_fixed3_enabled }}
               {% elif trigger.id == 'sunrise' %}
-                {{ true if !input sunrise_enable else false }}
+                {{ schedule_sunrise_enabled }}
               {% elif trigger.id == 'sunset' %}
-                {{ true if !input sunset_enable else false }}
+                {{ schedule_sunset_enabled }}
               {% elif trigger.id == 'manual_poll' %}
-                # If any manual entity is in 'on' or 'Start' and the manual enable is true
                 {{ (
                     (zones[0].manual_enabled and zones[0].manual_entity != '' and (states(zones[0].manual_entity) in ['on','Start'])) or
                     (zones[1].manual_enabled and zones[1].manual_entity != '' and (states(zones[1].manual_entity) in ['on','Start'])) or
