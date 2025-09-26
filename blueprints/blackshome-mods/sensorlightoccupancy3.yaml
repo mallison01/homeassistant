@@ -4211,35 +4211,42 @@ action:
                             state: 'on'
                             match: any
                 sequence:
-                  - alias: "Wait until all triggers are clear"
+                  - alias: "Wait until motion sensor is off"
+                    wait_for_trigger:
+                      - trigger: state
+                        entity_id: !input motion_trigger
+                        from: "on"
+                        to: "off"
+                  - alias: "Wait until occupancy is clear if enabled"
                     repeat:
-                      until:
+                      while:
                         - condition: and
                           conditions:
+                            - "{{ include_occupancy == 'occupancy_enabled' }}"
                             - condition: state
-                              entity_id: !input motion_trigger
-                              state: 'off'
-                              match: all
-                            - condition: or
-                              conditions:
-                                - "{{ include_occupancy == 'occupancy_disabled' }}"
-                                - condition: state
-                                  entity_id: !input occupancy_sensor
-                                  state: 'off'
-                                  match: all
-                                  for:
-                                    minutes: !input occupancy_cooldown
+                              entity_id: !input occupancy_sensor
+                              state: 'on'
+                              match: any
                       sequence:
-                        - alias: "Wait for state changes"
+                        - alias: "Wait for occupancy to turn off"
                           wait_for_trigger:
-                            - trigger: state
-                              entity_id: !input motion_trigger
-                              to: 'off'
                             - trigger: state
                               entity_id: !input occupancy_sensor
                               to: 'off'
                           timeout: "01:00:00"
-                          continue_on_timeout: true
+                  - choose:
+                    - alias: "Apply occupancy cooldown if enabled"
+                      conditions:
+                        - "{{ include_occupancy == 'occupancy_enabled' }}"
+                      sequence:
+                        - alias: "Wait for occupancy cooldown period"
+                          delay:
+                            minutes: !input occupancy_cooldown
+                        - alias: "Check if occupancy reactivated during cooldown"
+                          condition: state
+                          entity_id: !input occupancy_sensor
+                          state: 'off'
+                          match: all
           - alias: "Wait the number of minutes set in the night lights time delay"
             delay:
               minutes: !input night_time_delay
@@ -8685,35 +8692,42 @@ action:
                               state: 'on'
                               match: any
                   sequence:
-                    - alias: "Wait until all triggers are clear"
+                    - alias: "Wait until motion sensor is off"
+                      wait_for_trigger:
+                        - trigger: state
+                          entity_id: !input motion_trigger
+                          from: "on"
+                          to: "off"
+                    - alias: "Wait until occupancy is clear if enabled"
                       repeat:
-                        until:
+                        while:
                           - condition: and
                             conditions:
+                              - "{{ include_occupancy == 'occupancy_enabled' }}"
                               - condition: state
-                                entity_id: !input motion_trigger
-                                state: 'off'
-                                match: all
-                              - condition: or
-                                conditions:
-                                  - "{{ include_occupancy == 'occupancy_disabled' }}"
-                                  - condition: state
-                                    entity_id: !input occupancy_sensor
-                                    state: 'off'
-                                    match: all
-                                    for:
-                                      minutes: !input occupancy_cooldown
+                                entity_id: !input occupancy_sensor
+                                state: 'on'
+                                match: any
                         sequence:
-                          - alias: "Wait for state changes"
+                          - alias: "Wait for occupancy to turn off"
                             wait_for_trigger:
-                              - trigger: state
-                                entity_id: !input motion_trigger
-                                to: 'off'
                               - trigger: state
                                 entity_id: !input occupancy_sensor
                                 to: 'off'
                             timeout: "01:00:00"
-                            continue_on_timeout: true
+                    - choose:
+                      - alias: "Apply occupancy cooldown if enabled"
+                        conditions:
+                          - "{{ include_occupancy == 'occupancy_enabled' }}"
+                        sequence:
+                          - alias: "Wait for occupancy cooldown period"
+                            delay:
+                              minutes: !input occupancy_cooldown
+                          - alias: "Check if occupancy reactivated during cooldown"
+                            condition: state
+                            entity_id: !input occupancy_sensor
+                            state: 'off'
+                            match: all
               - alias: "Wait the number of minutes set in the normal lights time delay"
                 delay:
                   minutes: !input time_delay
