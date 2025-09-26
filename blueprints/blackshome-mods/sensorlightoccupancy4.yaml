@@ -4211,42 +4211,22 @@ action:
                             state: 'on'
                             match: any
                 sequence:
-                  - alias: "Wait until motion sensor is off"
-                    wait_for_trigger:
-                      - trigger: state
-                        entity_id: !input motion_trigger
-                        from: "on"
-                        to: "off"
-                  - alias: "Wait until occupancy is clear if enabled"
-                    repeat:
-                      while:
-                        - condition: and
-                          conditions:
-                            - "{{ include_occupancy == 'occupancy_enabled' }}"
-                            - condition: state
-                              entity_id: !input occupancy_sensor
-                              state: 'on'
-                              match: any
-                      sequence:
-                        - alias: "Wait for occupancy to turn off"
-                          wait_for_trigger:
-                            - trigger: state
-                              entity_id: !input occupancy_sensor
-                              to: 'off'
-                          timeout: "01:00:00"
+                  - alias: "Wait for all triggers to be clear"
+                    wait_template: >
+                      {{ 
+                        (states(motion_trigger) == 'off' or states(motion_trigger) | list | select('eq', 'off') | list | count == (motion_trigger | count))
+                        and 
+                        (include_occupancy == 'occupancy_disabled' or (states(occupancy_sensor) == 'off' or states(occupancy_sensor) | list | select('eq', 'off') | list | count == (occupancy_sensor | count)))
+                      }}
+                    timeout: "01:00:00"
                   - choose:
-                    - alias: "Apply occupancy cooldown if enabled"
+                    - alias: "Wait for occupancy cooldown if enabled"
                       conditions:
                         - "{{ include_occupancy == 'occupancy_enabled' }}"
                       sequence:
-                        - alias: "Wait for occupancy cooldown period"
+                        - alias: "Occupancy cooldown delay"
                           delay:
                             minutes: !input occupancy_cooldown
-                        - alias: "Check if occupancy reactivated during cooldown"
-                          condition: state
-                          entity_id: !input occupancy_sensor
-                          state: 'off'
-                          match: all
           - alias: "Wait the number of minutes set in the night lights time delay"
             delay:
               minutes: !input night_time_delay
@@ -8692,42 +8672,22 @@ action:
                               state: 'on'
                               match: any
                   sequence:
-                    - alias: "Wait until motion sensor is off"
-                      wait_for_trigger:
-                        - trigger: state
-                          entity_id: !input motion_trigger
-                          from: "on"
-                          to: "off"
-                    - alias: "Wait until occupancy is clear if enabled"
-                      repeat:
-                        while:
-                          - condition: and
-                            conditions:
-                              - "{{ include_occupancy == 'occupancy_enabled' }}"
-                              - condition: state
-                                entity_id: !input occupancy_sensor
-                                state: 'on'
-                                match: any
-                        sequence:
-                          - alias: "Wait for occupancy to turn off"
-                            wait_for_trigger:
-                              - trigger: state
-                                entity_id: !input occupancy_sensor
-                                to: 'off'
-                            timeout: "01:00:00"
+                    - alias: "Wait for all triggers to be clear"
+                      wait_template: >
+                        {{ 
+                          (states(motion_trigger) == 'off' or states(motion_trigger) | list | select('eq', 'off') | list | count == (motion_trigger | count))
+                          and 
+                          (include_occupancy == 'occupancy_disabled' or (states(occupancy_sensor) == 'off' or states(occupancy_sensor) | list | select('eq', 'off') | list | count == (occupancy_sensor | count)))
+                        }}
+                      timeout: "01:00:00"
                     - choose:
-                      - alias: "Apply occupancy cooldown if enabled"
+                      - alias: "Wait for occupancy cooldown if enabled"
                         conditions:
                           - "{{ include_occupancy == 'occupancy_enabled' }}"
                         sequence:
-                          - alias: "Wait for occupancy cooldown period"
+                          - alias: "Occupancy cooldown delay"
                             delay:
                               minutes: !input occupancy_cooldown
-                          - alias: "Check if occupancy reactivated during cooldown"
-                            condition: state
-                            entity_id: !input occupancy_sensor
-                            state: 'off'
-                            match: all
               - alias: "Wait the number of minutes set in the normal lights time delay"
                 delay:
                   minutes: !input time_delay
