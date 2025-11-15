@@ -3886,145 +3886,145 @@ action:
               - if:
                   - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
                 then:
-                  - variables:
-                      current_dynamic_brightness: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_bright = al_min_brightness_val | float(20) %}
-                          {% set max_bright = al_max_brightness_val | float(100) %}
-                          {% if brightness_mode_setting == 'sun_elevation' %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% else %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% endif %}
-                        {% elif brightness_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_brightness_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_brightness_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_brightness_val %}
-                          {% else %}
-                            {% set clamp.value = evening_brightness_val %}
-                          {% endif %}
-                        {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
-                          {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
-                            {% set clamp.value = light_brightness_pct %}
-                          {% else %}
-                            {% set lux_state = states(illuminance_entity) %}
-                            {% if lux_state in ['unknown', 'unavailable', 'none'] %}
+                      - variables:
+                          current_dynamic_brightness: >-
+                            {% set clamp = namespace(value=0) %}
+                            {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
                               {% set clamp.value = light_brightness_pct %}
-                            {% else %}
-                              {% set current_lux = lux_state | float(0) %}
-                              {% set min_lux = lux_for_min_brightness_val | float(50) %}
-                              {% set max_lux = lux_for_max_brightness_val | float(300) %}
-                              {% set min_bright = lux_min_brightness_val | float(10) %}
-                              {% set max_bright = lux_max_brightness_val | float(100) %}
-                              {% if brightness_mode_setting == 'lux' %}
-                                {% if current_lux <= min_lux %}
+                            {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
+                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                              {% set min_bright = al_min_brightness_val | float(20) %}
+                              {% set max_bright = al_max_brightness_val | float(100) %}
+                              {% if brightness_mode_setting == 'sun_elevation' %}
+                                {% if sun_elev <= min_elev %}
                                   {% set clamp.value = min_bright %}
-                                {% elif current_lux >= max_lux %}
+                                {% elif sun_elev >= max_elev %}
                                   {% set clamp.value = max_bright %}
                                 {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
                                   {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
                                 {% endif %}
                               {% else %}
-                                {% if current_lux <= min_lux %}
+                                {% if sun_elev <= min_elev %}
                                   {% set clamp.value = max_bright %}
-                                {% elif current_lux >= max_lux %}
+                                {% elif sun_elev >= max_elev %}
                                   {% set clamp.value = min_bright %}
                                 {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
                                   {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
                                 {% endif %}
                               {% endif %}
+                            {% elif brightness_mode_setting == 'time_based' %}
+                              {% set current_time = now().strftime('%H:%M:%S') %}
+                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                {% set clamp.value = late_night_brightness_val %}
+                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                {% set clamp.value = morning_brightness_val %}
+                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                {% set clamp.value = day_brightness_val %}
+                              {% else %}
+                                {% set clamp.value = evening_brightness_val %}
+                              {% endif %}
+                            {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
+                              {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
+                                {% set clamp.value = light_brightness_pct %}
+                              {% else %}
+                                {% set lux_state = states(illuminance_entity) %}
+                                {% if lux_state in ['unknown', 'unavailable', 'none'] %}
+                                  {% set clamp.value = light_brightness_pct %}
+                                {% else %}
+                                  {% set current_lux = lux_state | float(0) %}
+                                  {% set min_lux = lux_for_min_brightness_val | float(50) %}
+                                  {% set max_lux = lux_for_max_brightness_val | float(300) %}
+                                  {% set min_bright = lux_min_brightness_val | float(10) %}
+                                  {% set max_bright = lux_max_brightness_val | float(100) %}
+                                  {% if brightness_mode_setting == 'lux' %}
+                                    {% if current_lux <= min_lux %}
+                                      {% set clamp.value = min_bright %}
+                                    {% elif current_lux >= max_lux %}
+                                      {% set clamp.value = max_bright %}
+                                    {% else %}
+                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                      {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                    {% endif %}
+                                  {% else %}
+                                    {% if current_lux <= min_lux %}
+                                      {% set clamp.value = max_bright %}
+                                    {% elif current_lux >= max_lux %}
+                                      {% set clamp.value = min_bright %}
+                                    {% else %}
+                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                      {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                    {% endif %}
+                                  {% endif %}
+                                {% endif %}
+                              {% endif %}
+                            {% else %}
+                              {% set clamp.value = light_brightness_pct %}
                             {% endif %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% endif %}
-                        {{ ([1, clamp.value | int, 100] | sort)[1] }}
-                      
-                      current_dynamic_color_temp: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_color_temp %}
-                        {% elif color_temp_mode_setting == 'sun_elevation' %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_kelvin = al_min_kelvin_val | float(2700) %}
-                          {% set max_kelvin = al_max_kelvin_val | float(5000) %}
-                          {% if sun_elev <= min_elev %}
-                            {% set clamp.value = min_kelvin %}
-                          {% elif sun_elev >= max_elev %}
-                            {% set clamp.value = max_kelvin %}
-                          {% else %}
-                            {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                            {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
-                          {% endif %}
-                        {% elif color_temp_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_kelvin_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_kelvin_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_kelvin_val %}
-                          {% else %}
-                            {% set clamp.value = evening_kelvin_val %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_color_temp %}
-                        {% endif %}
-                        {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
-                      
-                      current_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in light_control_options %}
-                          {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
-                        {% endif %}
-                        {% if 'use_transition' in light_control_options %}
-                          {% set data = dict(data, transition=light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=light_effect) %}
-                        {% endif %}
-                        {% if light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
-                        {% elif light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=light_rgb) %}
-                        {% elif light_color_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=light_rgbw) %}
-                        {% elif light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
-                  - service: homeassistant.turn_on
-                    target: !input light_switch
-                    data: "{{ current_light_data }}"
+                            {{ ([1, clamp.value | int, 100] | sort)[1] }}
+
+                          current_dynamic_color_temp: >-
+                            {% set clamp = namespace(value=0) %}
+                            {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
+                              {% set clamp.value = light_color_temp %}
+                            {% elif color_temp_mode_setting == 'sun_elevation' %}
+                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                              {% set min_kelvin = al_min_kelvin_val | float(2700) %}
+                              {% set max_kelvin = al_max_kelvin_val | float(5000) %}
+                              {% if sun_elev <= min_elev %}
+                                {% set clamp.value = min_kelvin %}
+                              {% elif sun_elev >= max_elev %}
+                                {% set clamp.value = max_kelvin %}
+                              {% else %}
+                                {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
+                              {% endif %}
+                            {% elif color_temp_mode_setting == 'time_based' %}
+                              {% set current_time = now().strftime('%H:%M:%S') %}
+                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                {% set clamp.value = late_night_kelvin_val %}
+                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                {% set clamp.value = morning_kelvin_val %}
+                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                {% set clamp.value = day_kelvin_val %}
+                              {% else %}
+                                {% set clamp.value = evening_kelvin_val %}
+                              {% endif %}
+                            {% else %}
+                              {% set clamp.value = light_color_temp %}
+                            {% endif %}
+                            {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
+
+                          current_light_data: >-
+                            {% set data = {} %}
+                            {% if 'use_brightness' in light_control_options %}
+                              {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
+                            {% endif %}
+                            {% if 'use_transition' in light_control_options %}
+                              {% set data = dict(data, transition=light_transition_on_time) %}
+                            {% endif %}
+                            {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
+                              {% set data = dict(data, effect=light_effect) %}
+                            {% endif %}
+                            {% if light_color_control == 'use_color_temperature' %}
+                              {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
+                            {% elif light_color_control == 'use_rgb_color' %}
+                              {% set data = dict(data, rgb_color=light_rgb) %}
+                            {% elif light_color_control == 'use_rgbw_color' %}
+                              {% set data = dict(data, rgbw_color=light_rgbw) %}
+                            {% elif light_color_control == 'use_rgbww_color' %}
+                              {% set data = dict(data, rgbww_color=light_rgbww) %}
+                            {% endif %}
+                            {{ data }}
+
+                      - service: homeassistant.turn_on
+                        target: !input light_switch
+                        data: "{{ current_light_data }}"
               - if:
                   - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
                 then:
@@ -4668,158 +4668,158 @@ action:
                               - if:
                                   - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
                                 then:
-                  - variables:
-                      current_dynamic_brightness: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_bright = al_min_brightness_val | float(20) %}
-                          {% set max_bright = al_max_brightness_val | float(100) %}
-                          {% if brightness_mode_setting == 'sun_elevation' %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% else %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% endif %}
-                        {% elif brightness_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_brightness_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_brightness_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_brightness_val %}
-                          {% else %}
-                            {% set clamp.value = evening_brightness_val %}
-                          {% endif %}
-                        {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
-                          {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
-                            {% set clamp.value = light_brightness_pct %}
-                          {% else %}
-                            {% set lux_state = states(illuminance_entity) %}
-                            {% if lux_state in ['unknown', 'unavailable', 'none'] %}
-                              {% set clamp.value = light_brightness_pct %}
-                            {% else %}
-                              {% set current_lux = lux_state | float(0) %}
-                              {% set min_lux = lux_for_min_brightness_val | float(50) %}
-                              {% set max_lux = lux_for_max_brightness_val | float(300) %}
-                              {% set min_bright = lux_min_brightness_val | float(10) %}
-                              {% set max_bright = lux_max_brightness_val | float(100) %}
-                              {% if brightness_mode_setting == 'lux' %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% else %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% endif %}
-                            {% endif %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% endif %}
-                        {{ ([1, clamp.value | int, 100] | sort)[1] }}
-                      
-                      current_dynamic_color_temp: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_color_temp %}
-                        {% elif color_temp_mode_setting == 'sun_elevation' %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_kelvin = al_min_kelvin_val | float(2700) %}
-                          {% set max_kelvin = al_max_kelvin_val | float(5000) %}
-                          {% if sun_elev <= min_elev %}
-                            {% set clamp.value = min_kelvin %}
-                          {% elif sun_elev >= max_elev %}
-                            {% set clamp.value = max_kelvin %}
-                          {% else %}
-                            {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                            {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
-                          {% endif %}
-                        {% elif color_temp_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_kelvin_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_kelvin_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_kelvin_val %}
-                          {% else %}
-                            {% set clamp.value = evening_kelvin_val %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_color_temp %}
-                        {% endif %}
-                        {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
-                      
-                      current_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in light_control_options %}
-                          {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
-                        {% endif %}
-                        {% if 'use_transition' in light_control_options %}
-                          {% set data = dict(data, transition=light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=light_effect) %}
-                        {% endif %}
-                        {% if light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
-                        {% elif light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=light_rgb) %}
-                        {% elif light_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=light_rgbw) %}
-                        {% elif light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                      - variables:
+                                          current_dynamic_brightness: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_bright = al_min_brightness_val | float(20) %}
+                                              {% set max_bright = al_max_brightness_val | float(100) %}
+                                              {% if brightness_mode_setting == 'sun_elevation' %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% else %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_brightness_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_brightness_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_brightness_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_brightness_val %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
+                                              {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
+                                                {% set clamp.value = light_brightness_pct %}
+                                              {% else %}
+                                                {% set lux_state = states(illuminance_entity) %}
+                                                {% if lux_state in ['unknown', 'unavailable', 'none'] %}
+                                                  {% set clamp.value = light_brightness_pct %}
+                                                {% else %}
+                                                  {% set current_lux = lux_state | float(0) %}
+                                                  {% set min_lux = lux_for_min_brightness_val | float(50) %}
+                                                  {% set max_lux = lux_for_max_brightness_val | float(300) %}
+                                                  {% set min_bright = lux_min_brightness_val | float(10) %}
+                                                  {% set max_bright = lux_max_brightness_val | float(100) %}
+                                                  {% if brightness_mode_setting == 'lux' %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% else %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% endif %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% endif %}
+                                            {{ ([1, clamp.value | int, 100] | sort)[1] }}
+                                          
+                                          current_dynamic_color_temp: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% elif color_temp_mode_setting == 'sun_elevation' %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_kelvin = al_min_kelvin_val | float(2700) %}
+                                              {% set max_kelvin = al_max_kelvin_val | float(5000) %}
+                                              {% if sun_elev <= min_elev %}
+                                                {% set clamp.value = min_kelvin %}
+                                              {% elif sun_elev >= max_elev %}
+                                                {% set clamp.value = max_kelvin %}
+                                              {% else %}
+                                                {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
+                                              {% endif %}
+                                            {% elif color_temp_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_kelvin_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_kelvin_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_kelvin_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_kelvin_val %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% endif %}
+                                            {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
+                                          
+                                          current_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in light_control_options %}
+                                              {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in light_control_options %}
+                                              {% set data = dict(data, transition=light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=light_effect) %}
+                                            {% endif %}
+                                            {% if light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
+                                            {% elif light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=light_rgb) %}
+                                            {% elif light_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=light_rgbw) %}
+                                            {% elif light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
-                                  - service: homeassistant.turn_on
-                                    target: !input light_switch
-                                    data: "{{ current_light_data }}"
-                              - if:
-                                  - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
-                                then:
-                                  - condition: template
-                                    value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
-                                  - service: homeassistant.turn_on
-                                    target:
+                                                      - service: homeassistant.turn_on
+                                                        target: !input light_switch
+                                                        data: "{{ current_light_data }}"
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
+                                                    then:
+                                                      - condition: template
+                                                        value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
+                                                      - service: homeassistant.turn_on
+                                                        target:
                                       entity_id: "{{ on_scene_entity }}"
-                                  - if:
+                                                      - if:
                                       - "{{ boolean_scenes_scripts_entity is not none and boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ boolean_scenes_scripts_entity }}"
@@ -5111,199 +5111,199 @@ action:
                                   - if:
                                       - "{{ night_lights_target is not none and night_lights_target != {} and night_lights_target.entity_id is defined and night_lights_target.entity_id | select | list | length > 0 }}"
                                     then:
-                  - variables:
-                      current_night_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in night_light_control_options %}
-                          {% set data = dict(data, brightness_pct=night_light_brightness_pct) %}
-                        {% endif %}
-                        {% if 'use_transition' in night_light_control_options %}
-                          {% set data = dict(data, transition=night_light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in night_light_control_options and night_light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=night_light_effect) %}
-                        {% endif %}
-                        {% if night_light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=night_light_color_temp) %}
-                        {% elif night_light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=night_light_rgb) %}
-                        {% elif night_light_color_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=night_light_rgbw) %}
-                        {% elif night_light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=night_light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                      - variables:
+                                          current_night_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in night_light_control_options %}
+                                              {% set data = dict(data, brightness_pct=night_light_brightness_pct) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in night_light_control_options %}
+                                              {% set data = dict(data, transition=night_light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in night_light_control_options and night_light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=night_light_effect) %}
+                                            {% endif %}
+                                            {% if night_light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=night_light_color_temp) %}
+                                            {% elif night_light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=night_light_rgb) %}
+                                            {% elif night_light_color_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=night_light_rgbw) %}
+                                            {% elif night_light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=night_light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
                                       - service: homeassistant.turn_on
                                         target: !input night_lights
                                         data: "{{ current_night_light_data }}"
-                                  - if:
+                                                      - if:
                                       - "{{ night_boolean_scenes_scripts_entity is not none and night_boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(night_boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ night_boolean_scenes_scripts_entity }}"
-                        default:
-                          - if:
-                              - "{{ allows_turn_on }}"
-                            then:
-                              - if:
-                                  - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
-                                then:
-                  - variables:
-                      current_dynamic_brightness: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_bright = al_min_brightness_val | float(20) %}
-                          {% set max_bright = al_max_brightness_val | float(100) %}
-                          {% if brightness_mode_setting == 'sun_elevation' %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% else %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% endif %}
-                        {% elif brightness_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_brightness_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_brightness_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_brightness_val %}
-                          {% else %}
-                            {% set clamp.value = evening_brightness_val %}
-                          {% endif %}
-                        {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
-                          {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
-                            {% set clamp.value = light_brightness_pct %}
-                          {% else %}
-                            {% set lux_state = states(illuminance_entity) %}
-                            {% if lux_state in ['unknown', 'unavailable', 'none'] %}
-                              {% set clamp.value = light_brightness_pct %}
-                            {% else %}
-                              {% set current_lux = lux_state | float(0) %}
-                              {% set min_lux = lux_for_min_brightness_val | float(50) %}
-                              {% set max_lux = lux_for_max_brightness_val | float(300) %}
-                              {% set min_bright = lux_min_brightness_val | float(10) %}
-                              {% set max_bright = lux_max_brightness_val | float(100) %}
-                              {% if brightness_mode_setting == 'lux' %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% else %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% endif %}
-                            {% endif %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% endif %}
-                        {{ ([1, clamp.value | int, 100] | sort)[1] }}
-                      
-                      current_dynamic_color_temp: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_color_temp %}
-                        {% elif color_temp_mode_setting == 'sun_elevation' %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_kelvin = al_min_kelvin_val | float(2700) %}
-                          {% set max_kelvin = al_max_kelvin_val | float(5000) %}
-                          {% if sun_elev <= min_elev %}
-                            {% set clamp.value = min_kelvin %}
-                          {% elif sun_elev >= max_elev %}
-                            {% set clamp.value = max_kelvin %}
-                          {% else %}
-                            {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                            {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
-                          {% endif %}
-                        {% elif color_temp_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_kelvin_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_kelvin_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_kelvin_val %}
-                          {% else %}
-                            {% set clamp.value = evening_kelvin_val %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_color_temp %}
-                        {% endif %}
-                        {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
-                      
-                      current_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in light_control_options %}
-                          {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
-                        {% endif %}
-                        {% if 'use_transition' in light_control_options %}
-                          {% set data = dict(data, transition=light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=light_effect) %}
-                        {% endif %}
-                        {% if light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
-                        {% elif light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=light_rgb) %}
-                        {% elif light_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=light_rgbw) %}
-                        {% elif light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                            default:
+                                              - if:
+                                                  - "{{ allows_turn_on }}"
+                                                then:
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
+                                                    then:
+                                      - variables:
+                                          current_dynamic_brightness: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_bright = al_min_brightness_val | float(20) %}
+                                              {% set max_bright = al_max_brightness_val | float(100) %}
+                                              {% if brightness_mode_setting == 'sun_elevation' %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% else %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_brightness_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_brightness_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_brightness_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_brightness_val %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
+                                              {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
+                                                {% set clamp.value = light_brightness_pct %}
+                                              {% else %}
+                                                {% set lux_state = states(illuminance_entity) %}
+                                                {% if lux_state in ['unknown', 'unavailable', 'none'] %}
+                                                  {% set clamp.value = light_brightness_pct %}
+                                                {% else %}
+                                                  {% set current_lux = lux_state | float(0) %}
+                                                  {% set min_lux = lux_for_min_brightness_val | float(50) %}
+                                                  {% set max_lux = lux_for_max_brightness_val | float(300) %}
+                                                  {% set min_bright = lux_min_brightness_val | float(10) %}
+                                                  {% set max_bright = lux_max_brightness_val | float(100) %}
+                                                  {% if brightness_mode_setting == 'lux' %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% else %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% endif %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% endif %}
+                                            {{ ([1, clamp.value | int, 100] | sort)[1] }}
+                                          
+                                          current_dynamic_color_temp: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% elif color_temp_mode_setting == 'sun_elevation' %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_kelvin = al_min_kelvin_val | float(2700) %}
+                                              {% set max_kelvin = al_max_kelvin_val | float(5000) %}
+                                              {% if sun_elev <= min_elev %}
+                                                {% set clamp.value = min_kelvin %}
+                                              {% elif sun_elev >= max_elev %}
+                                                {% set clamp.value = max_kelvin %}
+                                              {% else %}
+                                                {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
+                                              {% endif %}
+                                            {% elif color_temp_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_kelvin_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_kelvin_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_kelvin_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_kelvin_val %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% endif %}
+                                            {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
+                                          
+                                          current_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in light_control_options %}
+                                              {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in light_control_options %}
+                                              {% set data = dict(data, transition=light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=light_effect) %}
+                                            {% endif %}
+                                            {% if light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
+                                            {% elif light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=light_rgb) %}
+                                            {% elif light_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=light_rgbw) %}
+                                            {% elif light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
-                                  - service: homeassistant.turn_on
-                                    target: !input light_switch
-                                    data: "{{ current_light_data }}"
-                              - if:
-                                  - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
-                                then:
-                                  - condition: template
-                                    value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
-                                  - service: homeassistant.turn_on
-                                    target:
+                                                      - service: homeassistant.turn_on
+                                                        target: !input light_switch
+                                                        data: "{{ current_light_data }}"
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
+                                                    then:
+                                                      - condition: template
+                                                        value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
+                                                      - service: homeassistant.turn_on
+                                                        target:
                                       entity_id: "{{ on_scene_entity }}"
-                                  - if:
+                                                      - if:
                                       - "{{ boolean_scenes_scripts_entity is not none and boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ boolean_scenes_scripts_entity }}"
@@ -5916,199 +5916,199 @@ action:
                                   - if:
                                       - "{{ night_lights_target is not none and night_lights_target != {} and night_lights_target.entity_id is defined and night_lights_target.entity_id | select | list | length > 0 }}"
                                     then:
-                  - variables:
-                      current_night_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in night_light_control_options %}
-                          {% set data = dict(data, brightness_pct=night_light_brightness_pct) %}
-                        {% endif %}
-                        {% if 'use_transition' in night_light_control_options %}
-                          {% set data = dict(data, transition=night_light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in night_light_control_options and night_light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=night_light_effect) %}
-                        {% endif %}
-                        {% if night_light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=night_light_color_temp) %}
-                        {% elif night_light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=night_light_rgb) %}
-                        {% elif night_light_color_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=night_light_rgbw) %}
-                        {% elif night_light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=night_light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                      - variables:
+                                          current_night_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in night_light_control_options %}
+                                              {% set data = dict(data, brightness_pct=night_light_brightness_pct) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in night_light_control_options %}
+                                              {% set data = dict(data, transition=night_light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in night_light_control_options and night_light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=night_light_effect) %}
+                                            {% endif %}
+                                            {% if night_light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=night_light_color_temp) %}
+                                            {% elif night_light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=night_light_rgb) %}
+                                            {% elif night_light_color_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=night_light_rgbw) %}
+                                            {% elif night_light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=night_light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
                                       - service: homeassistant.turn_on
                                         target: !input night_lights
                                         data: "{{ current_night_light_data }}"
-                                  - if:
+                                                      - if:
                                       - "{{ night_boolean_scenes_scripts_entity is not none and night_boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(night_boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ night_boolean_scenes_scripts_entity }}"
-                        default:
-                          - if:
-                              - "{{ allows_turn_on }}"
-                            then:
-                              - if:
-                                  - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
-                                then:
-                  - variables:
-                      current_dynamic_brightness: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_bright = al_min_brightness_val | float(20) %}
-                          {% set max_bright = al_max_brightness_val | float(100) %}
-                          {% if brightness_mode_setting == 'sun_elevation' %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% else %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% endif %}
-                        {% elif brightness_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_brightness_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_brightness_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_brightness_val %}
-                          {% else %}
-                            {% set clamp.value = evening_brightness_val %}
-                          {% endif %}
-                        {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
-                          {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
-                            {% set clamp.value = light_brightness_pct %}
-                          {% else %}
-                            {% set lux_state = states(illuminance_entity) %}
-                            {% if lux_state in ['unknown', 'unavailable', 'none'] %}
-                              {% set clamp.value = light_brightness_pct %}
-                            {% else %}
-                              {% set current_lux = lux_state | float(0) %}
-                              {% set min_lux = lux_for_min_brightness_val | float(50) %}
-                              {% set max_lux = lux_for_max_brightness_val | float(300) %}
-                              {% set min_bright = lux_min_brightness_val | float(10) %}
-                              {% set max_bright = lux_max_brightness_val | float(100) %}
-                              {% if brightness_mode_setting == 'lux' %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% else %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% endif %}
-                            {% endif %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% endif %}
-                        {{ ([1, clamp.value | int, 100] | sort)[1] }}
-                      
-                      current_dynamic_color_temp: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_color_temp %}
-                        {% elif color_temp_mode_setting == 'sun_elevation' %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_kelvin = al_min_kelvin_val | float(2700) %}
-                          {% set max_kelvin = al_max_kelvin_val | float(5000) %}
-                          {% if sun_elev <= min_elev %}
-                            {% set clamp.value = min_kelvin %}
-                          {% elif sun_elev >= max_elev %}
-                            {% set clamp.value = max_kelvin %}
-                          {% else %}
-                            {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                            {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
-                          {% endif %}
-                        {% elif color_temp_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_kelvin_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_kelvin_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_kelvin_val %}
-                          {% else %}
-                            {% set clamp.value = evening_kelvin_val %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_color_temp %}
-                        {% endif %}
-                        {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
-                      
-                      current_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in light_control_options %}
-                          {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
-                        {% endif %}
-                        {% if 'use_transition' in light_control_options %}
-                          {% set data = dict(data, transition=light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=light_effect) %}
-                        {% endif %}
-                        {% if light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
-                        {% elif light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=light_rgb) %}
-                        {% elif light_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=light_rgbw) %}
-                        {% elif light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                            default:
+                                              - if:
+                                                  - "{{ allows_turn_on }}"
+                                                then:
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
+                                                    then:
+                                      - variables:
+                                          current_dynamic_brightness: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_bright = al_min_brightness_val | float(20) %}
+                                              {% set max_bright = al_max_brightness_val | float(100) %}
+                                              {% if brightness_mode_setting == 'sun_elevation' %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% else %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_brightness_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_brightness_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_brightness_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_brightness_val %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
+                                              {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
+                                                {% set clamp.value = light_brightness_pct %}
+                                              {% else %}
+                                                {% set lux_state = states(illuminance_entity) %}
+                                                {% if lux_state in ['unknown', 'unavailable', 'none'] %}
+                                                  {% set clamp.value = light_brightness_pct %}
+                                                {% else %}
+                                                  {% set current_lux = lux_state | float(0) %}
+                                                  {% set min_lux = lux_for_min_brightness_val | float(50) %}
+                                                  {% set max_lux = lux_for_max_brightness_val | float(300) %}
+                                                  {% set min_bright = lux_min_brightness_val | float(10) %}
+                                                  {% set max_bright = lux_max_brightness_val | float(100) %}
+                                                  {% if brightness_mode_setting == 'lux' %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% else %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% endif %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% endif %}
+                                            {{ ([1, clamp.value | int, 100] | sort)[1] }}
+                                          
+                                          current_dynamic_color_temp: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% elif color_temp_mode_setting == 'sun_elevation' %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_kelvin = al_min_kelvin_val | float(2700) %}
+                                              {% set max_kelvin = al_max_kelvin_val | float(5000) %}
+                                              {% if sun_elev <= min_elev %}
+                                                {% set clamp.value = min_kelvin %}
+                                              {% elif sun_elev >= max_elev %}
+                                                {% set clamp.value = max_kelvin %}
+                                              {% else %}
+                                                {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
+                                              {% endif %}
+                                            {% elif color_temp_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_kelvin_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_kelvin_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_kelvin_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_kelvin_val %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% endif %}
+                                            {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
+                                          
+                                          current_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in light_control_options %}
+                                              {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in light_control_options %}
+                                              {% set data = dict(data, transition=light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=light_effect) %}
+                                            {% endif %}
+                                            {% if light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
+                                            {% elif light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=light_rgb) %}
+                                            {% elif light_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=light_rgbw) %}
+                                            {% elif light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
-                                  - service: homeassistant.turn_on
-                                    target: !input light_switch
-                                    data: "{{ current_light_data }}"
-                              - if:
-                                  - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
-                                then:
-                                  - condition: template
-                                    value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
-                                  - service: homeassistant.turn_on
-                                    target:
+                                                      - service: homeassistant.turn_on
+                                                        target: !input light_switch
+                                                        data: "{{ current_light_data }}"
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
+                                                    then:
+                                                      - condition: template
+                                                        value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
+                                                      - service: homeassistant.turn_on
+                                                        target:
                                       entity_id: "{{ on_scene_entity }}"
-                                  - if:
+                                                      - if:
                                       - "{{ boolean_scenes_scripts_entity is not none and boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ boolean_scenes_scripts_entity }}"
@@ -6167,201 +6167,201 @@ action:
                                   - if:
                                       - "{{ night_lights_target is not none and night_lights_target != {} and night_lights_target.entity_id is defined and night_lights_target.entity_id | select | list | length > 0 }}"
                                     then:
-                  - variables:
-                      current_night_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in night_light_control_options %}
-                          {% set data = dict(data, brightness_pct=night_light_brightness_pct) %}
-                        {% endif %}
-                        {% if 'use_transition' in night_light_control_options %}
-                          {% set data = dict(data, transition=night_light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in night_light_control_options and night_light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=night_light_effect) %}
-                        {% endif %}
-                        {% if night_light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=night_light_color_temp) %}
-                        {% elif night_light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=night_light_rgb) %}
-                        {% elif night_light_color_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=night_light_rgbw) %}
-                        {% elif night_light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=night_light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                      - variables:
+                                          current_night_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in night_light_control_options %}
+                                              {% set data = dict(data, brightness_pct=night_light_brightness_pct) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in night_light_control_options %}
+                                              {% set data = dict(data, transition=night_light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in night_light_control_options and night_light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=night_light_effect) %}
+                                            {% endif %}
+                                            {% if night_light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=night_light_color_temp) %}
+                                            {% elif night_light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=night_light_rgb) %}
+                                            {% elif night_light_color_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=night_light_rgbw) %}
+                                            {% elif night_light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=night_light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
                                       - service: homeassistant.turn_on
                                         target: !input night_lights
                                         data: "{{ current_night_light_data }}"
-                                  - if:
+                                                      - if:
                                       - "{{ night_boolean_scenes_scripts_entity is not none and night_boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(night_boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ night_boolean_scenes_scripts_entity }}"
-                            default:
-                              - if:
-                                  - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
-                                then:
-                  - variables:
-                      current_dynamic_brightness: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_bright = al_min_brightness_val | float(20) %}
-                          {% set max_bright = al_max_brightness_val | float(100) %}
-                          {% if brightness_mode_setting == 'sun_elevation' %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% else %}
-                            {% if sun_elev <= min_elev %}
-                              {% set clamp.value = max_bright %}
-                            {% elif sun_elev >= max_elev %}
-                              {% set clamp.value = min_bright %}
-                            {% else %}
-                              {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                              {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                            {% endif %}
-                          {% endif %}
-                        {% elif brightness_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_brightness_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_brightness_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_brightness_val %}
-                          {% else %}
-                            {% set clamp.value = evening_brightness_val %}
-                          {% endif %}
-                        {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
-                          {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
-                            {% set clamp.value = light_brightness_pct %}
-                          {% else %}
-                            {% set lux_state = states(illuminance_entity) %}
-                            {% if lux_state in ['unknown', 'unavailable', 'none'] %}
-                              {% set clamp.value = light_brightness_pct %}
-                            {% else %}
-                              {% set current_lux = lux_state | float(0) %}
-                              {% set min_lux = lux_for_min_brightness_val | float(50) %}
-                              {% set max_lux = lux_for_max_brightness_val | float(300) %}
-                              {% set min_bright = lux_min_brightness_val | float(10) %}
-                              {% set max_bright = lux_max_brightness_val | float(100) %}
-                              {% if brightness_mode_setting == 'lux' %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% else %}
-                                {% if current_lux <= min_lux %}
-                                  {% set clamp.value = max_bright %}
-                                {% elif current_lux >= max_lux %}
-                                  {% set clamp.value = min_bright %}
-                                {% else %}
-                                  {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
-                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
-                                {% endif %}
-                              {% endif %}
-                            {% endif %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_brightness_pct %}
-                        {% endif %}
-                        {{ ([1, clamp.value | int, 100] | sort)[1] }}
-                      
-                      current_dynamic_color_temp: >-
-                        {% set clamp = namespace(value=0) %}
-                        {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
-                          {% set clamp.value = light_color_temp %}
-                        {% elif color_temp_mode_setting == 'sun_elevation' %}
-                          {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
-                          {% set min_elev = al_sunset_elevation_val | float(-6) %}
-                          {% set max_elev = al_noon_elevation_val | float(60) %}
-                          {% set min_kelvin = al_min_kelvin_val | float(2700) %}
-                          {% set max_kelvin = al_max_kelvin_val | float(5000) %}
-                          {% if sun_elev <= min_elev %}
-                            {% set clamp.value = min_kelvin %}
-                          {% elif sun_elev >= max_elev %}
-                            {% set clamp.value = max_kelvin %}
-                          {% else %}
-                            {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
-                            {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
-                          {% endif %}
-                        {% elif color_temp_mode_setting == 'time_based' %}
-                          {% set current_time = now().strftime('%H:%M:%S') %}
-                          {% if current_time >= late_night_time_val or current_time < morning_time_val %}
-                            {% set clamp.value = late_night_kelvin_val %}
-                          {% elif current_time >= morning_time_val and current_time < day_time_val %}
-                            {% set clamp.value = morning_kelvin_val %}
-                          {% elif current_time >= day_time_val and current_time < evening_time_val %}
-                            {% set clamp.value = day_kelvin_val %}
-                          {% else %}
-                            {% set clamp.value = evening_kelvin_val %}
-                          {% endif %}
-                        {% else %}
-                          {% set clamp.value = light_color_temp %}
-                        {% endif %}
-                        {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
-                      
-                      current_light_data: >-
-                        {% set data = {} %}
-                        {% if 'use_brightness' in light_control_options %}
-                          {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
-                        {% endif %}
-                        {% if 'use_transition' in light_control_options %}
-                          {% set data = dict(data, transition=light_transition_on_time) %}
-                        {% endif %}
-                        {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
-                          {% set data = dict(data, effect=light_effect) %}
-                        {% endif %}
-                        {% if light_color_control == 'use_color_temperature' %}
-                          {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
-                        {% elif light_color_control == 'use_rgb_color' %}
-                          {% set data = dict(data, rgb_color=light_rgb) %}
-                        {% elif light_control == 'use_rgbw_color' %}
-                          {% set data = dict(data, rgbw_color=light_rgbw) %}
-                        {% elif light_color_control == 'use_rgbww_color' %}
-                          {% set data = dict(data, rgbww_color=light_rgbww) %}
-                        {% endif %}
-                        {{ data }}
-                  
+                                                default:
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'devices' or light_control_type_var == 'both') and has_light_entity }}"
+                                                    then:
+                                      - variables:
+                                          current_dynamic_brightness: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or brightness_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% elif brightness_mode_setting in ['sun_elevation', 'sun_elevation_inverted'] %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_bright = al_min_brightness_val | float(20) %}
+                                              {% set max_bright = al_max_brightness_val | float(100) %}
+                                              {% if brightness_mode_setting == 'sun_elevation' %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% else %}
+                                                {% if sun_elev <= min_elev %}
+                                                  {% set clamp.value = max_bright %}
+                                                {% elif sun_elev >= max_elev %}
+                                                  {% set clamp.value = min_bright %}
+                                                {% else %}
+                                                  {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                  {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_brightness_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_brightness_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_brightness_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_brightness_val %}
+                                              {% endif %}
+                                            {% elif brightness_mode_setting in ['lux', 'lux_inverted'] %}
+                                              {% if not use_illuminance_sensor or illuminance_entity is none or illuminance_entity == '' %}
+                                                {% set clamp.value = light_brightness_pct %}
+                                              {% else %}
+                                                {% set lux_state = states(illuminance_entity) %}
+                                                {% if lux_state in ['unknown', 'unavailable', 'none'] %}
+                                                  {% set clamp.value = light_brightness_pct %}
+                                                {% else %}
+                                                  {% set current_lux = lux_state | float(0) %}
+                                                  {% set min_lux = lux_for_min_brightness_val | float(50) %}
+                                                  {% set max_lux = lux_for_max_brightness_val | float(300) %}
+                                                  {% set min_bright = lux_min_brightness_val | float(10) %}
+                                                  {% set max_bright = lux_max_brightness_val | float(100) %}
+                                                  {% if brightness_mode_setting == 'lux' %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = min_bright + (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% else %}
+                                                    {% if current_lux <= min_lux %}
+                                                      {% set clamp.value = max_bright %}
+                                                    {% elif current_lux >= max_lux %}
+                                                      {% set clamp.value = min_bright %}
+                                                    {% else %}
+                                                      {% set ratio = (current_lux - min_lux) / (max_lux - min_lux) %}
+                                                      {% set clamp.value = max_bright - (ratio * (max_bright - min_bright)) %}
+                                                    {% endif %}
+                                                  {% endif %}
+                                                {% endif %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_brightness_pct %}
+                                            {% endif %}
+                                            {{ ([1, clamp.value | int, 100] | sort)[1] }}
+                                          
+                                          current_dynamic_color_temp: >-
+                                            {% set clamp = namespace(value=0) %}
+                                            {% if not use_dynamic_lighting_feature or color_temp_mode_setting == 'fixed' %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% elif color_temp_mode_setting == 'sun_elevation' %}
+                                              {% set sun_elev = state_attr('sun.sun', 'elevation') | float(0) %}
+                                              {% set min_elev = al_sunset_elevation_val | float(-6) %}
+                                              {% set max_elev = al_noon_elevation_val | float(60) %}
+                                              {% set min_kelvin = al_min_kelvin_val | float(2700) %}
+                                              {% set max_kelvin = al_max_kelvin_val | float(5000) %}
+                                              {% if sun_elev <= min_elev %}
+                                                {% set clamp.value = min_kelvin %}
+                                              {% elif sun_elev >= max_elev %}
+                                                {% set clamp.value = max_kelvin %}
+                                              {% else %}
+                                                {% set ratio = (sun_elev - min_elev) / (max_elev - min_elev) %}
+                                                {% set clamp.value = min_kelvin + (ratio * (max_kelvin - min_kelvin)) %}
+                                              {% endif %}
+                                            {% elif color_temp_mode_setting == 'time_based' %}
+                                              {% set current_time = now().strftime('%H:%M:%S') %}
+                                              {% if current_time >= late_night_time_val or current_time < morning_time_val %}
+                                                {% set clamp.value = late_night_kelvin_val %}
+                                              {% elif current_time >= morning_time_val and current_time < day_time_val %}
+                                                {% set clamp.value = morning_kelvin_val %}
+                                              {% elif current_time >= day_time_val and current_time < evening_time_val %}
+                                                {% set clamp.value = day_kelvin_val %}
+                                              {% else %}
+                                                {% set clamp.value = evening_kelvin_val %}
+                                              {% endif %}
+                                            {% else %}
+                                              {% set clamp.value = light_color_temp %}
+                                            {% endif %}
+                                            {{ ([2000, clamp.value | int, 8000] | sort)[1] }}
+                                          
+                                          current_light_data: >-
+                                            {% set data = {} %}
+                                            {% if 'use_brightness' in light_control_options %}
+                                              {% set data = dict(data, brightness_pct=current_dynamic_brightness) %}
+                                            {% endif %}
+                                            {% if 'use_transition' in light_control_options %}
+                                              {% set data = dict(data, transition=light_transition_on_time) %}
+                                            {% endif %}
+                                            {% if 'use_effect' in light_control_options and light_effect not in [none, ''] %}
+                                              {% set data = dict(data, effect=light_effect) %}
+                                            {% endif %}
+                                            {% if light_color_control == 'use_color_temperature' %}
+                                              {% set data = dict(data, kelvin=current_dynamic_color_temp) %}
+                                            {% elif light_color_control == 'use_rgb_color' %}
+                                              {% set data = dict(data, rgb_color=light_rgb) %}
+                                            {% elif light_control == 'use_rgbw_color' %}
+                                              {% set data = dict(data, rgbw_color=light_rgbw) %}
+                                            {% elif light_color_control == 'use_rgbww_color' %}
+                                              {% set data = dict(data, rgbww_color=light_rgbww) %}
+                                            {% endif %}
+                                            {{ data }}
+                                      
 
-                                  - service: homeassistant.turn_on
-                                    target: !input light_switch
-                                    data: "{{ current_light_data }}"
-                              - if:
-                                  - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
-                                then:
-                                  - condition: template
-                                    value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
-                                  - service: homeassistant.turn_on
-                                    target:
+                                                      - service: homeassistant.turn_on
+                                                        target: !input light_switch
+                                                        data: "{{ current_light_data }}"
+                                                  - if:
+                                                      - "{{ (light_control_type_var == 'scenes' or light_control_type_var == 'both') and has_scene_entity }}"
+                                                    then:
+                                                      - condition: template
+                                                        value_template: "{{ states(on_scene_entity) not in ['unavailable', 'unknown'] }}"
+                                                      - service: homeassistant.turn_on
+                                                        target:
                                       entity_id: "{{ on_scene_entity }}"
-                                  - if:
+                                                      - if:
                                       - "{{ boolean_scenes_scripts_entity is not none and boolean_scenes_scripts_entity != '' }}"
                                       - "{{ states(boolean_scenes_scripts_entity) not in ['unavailable', 'unknown'] }}"
-                                    then:
+                                                        then:
                                       - service: input_boolean.turn_on
                                         target:
                                           entity_id: "{{ boolean_scenes_scripts_entity }}"
-                    else:
-                      - stop: "Trigger fired but feature not enabled"
+                                        else:
+                                          - stop: "Trigger fired but feature not enabled"
 
               # ========================================================================
               # TRIGGER: Any trigger OFF (simple mode) - ENHANCED v5.0.4
